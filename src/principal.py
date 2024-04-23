@@ -75,9 +75,9 @@ async def cancelar_riego(request):
         return render_template(template)
 """
     
-@app.route('/seteo_hora', methods=['GET', 'POST'])
+@app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
-    template = 'templates/seteo_hora.html'
+    template = 'templates/config.html'
 
     if request.method == 'POST':
         post_time_str = request.form["datetime"]

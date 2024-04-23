@@ -15,7 +15,7 @@ SOURCE_DIR="../template_sources"
 
 
 TEMPLATES=("index.html"
-	"seteo_hora.html"
+	"config.html"
 	"horas_arranque.html"
 	"tiempos_riego.html"
 	)	
