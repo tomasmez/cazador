@@ -1,0 +1,89 @@
+    <form action="/horas_arranque" method="POST">
+
+<div id="horas_arranque" style="display: block;">
+    <h3>Programa 1</h3>
+    <label>
+        <input type="checkbox" name="programa_1">
+        Programa 1
+    </label>
+    <select name="programa_1_start_hour" id="startHourSelect1">
+        <option value="1">1</option>
+        <!-- Add more options for start hours -->
+    </select>
+    <select name="programa_1_start_minute" id="startMinuteSelect1">
+        <option value="0">00</option>
+        <!-- Add more options for start minutes -->
+    </select>
+
+    <h3>Programa 2</h3>
+    <label>
+        <input type="checkbox" name="programa_2">
+        Programa 2
+    </label>
+    <select name="programa_2_start_hour" id="startHourSelect2">
+        <option value="1">1</option>
+        <!-- Add more options for start hours -->
+    </select>
+    <select name="programa_2_start_minute" id="startMinuteSelect2">
+        <option value="0">00</option>
+        <!-- Add more options for start minutes -->
+    </select>
+
+    <h3>Programa 3</h3>
+    <label>
+        <input type="checkbox" name="programa_3">
+        Programa 3
+    </label>
+    <select name="programa_3_start_hour" id="startHourSelect3">
+        <option value="1">1</option>
+        <!-- Add more options for start hours -->
+    </select>
+    <select name="programa_3_start_minute" id="startMinuteSelect3">
+        <option value="0">00</option>
+        <!-- Add more options for start minutes -->
+    </select>
+</div>
+
+<input type="submit" value="Setear hora arranque">
+
+
+    </form>
+
+<script>
+    
+    // Function to create options for hours and minutes
+    function createOptions(selectElement, start, end, defaultValue) {
+        for (let value = start; value <= end; value++) {
+            const option = document.createElement('option');
+            option.value = value.toString().padStart(2, '0');
+            option.textContent = option.value;
+            if (option.value === defaultValue) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        }
+    }
+    
+    // Create options for the first set of dropdowns
+    const hourSelect1 = document.getElementById('startHourSelect1');
+    const minuteSelect1 = document.getElementById('startMinuteSelect1');
+    createOptions(hourSelect1, 0, 23, '07');
+    createOptions(minuteSelect1, 0, 59, '00');
+    
+    // Create options for the second set of dropdowns
+    const hourSelect2 = document.getElementById('startHourSelect2');
+    const minuteSelect2 = document.getElementById('startMinuteSelect2');
+    createOptions(hourSelect2, 0, 23, '07');
+    createOptions(minuteSelect2, 0, 59, '00');
+
+    // Create options for the second set of dropdowns
+    const hourSelect3 = document.getElementById('startHourSelect3');
+    const minuteSelect3 = document.getElementById('startMinuteSelect3');
+    createOptions(hourSelect3, 0, 23, '07');
+    createOptions(minuteSelect3, 0, 59, '00');
+    
+</script>
+
+
+</body>
+</html>
