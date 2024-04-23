@@ -1,12 +1,11 @@
-#Proyecto Cazador
 
-# Proyecto SCR
+# Proyecto Cazador del Delta
 
 Este repositorio contiene los archivos fuente necesarios para el desarrollo del proyecto SCR. Aquí encontrarás tanto el código fuente como los binarios precompilados.
 
 ## Estructura de archivos
 
-- **/src**: Contiene todos los archivos fuente del proyecto SCR.
+- **/src**: Contiene todos los archivos fuente del proyecto Cazador del Delta.
 - **/bin**: Aquí se encuentran los binarios precompilados. Es importante destacar que estos binarios se generan a partir de los archivos fuente ubicados en la carpeta /src.
   
 ## Compilación
