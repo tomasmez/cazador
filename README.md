@@ -13,7 +13,7 @@ Este repositorio contiene los archivos fuente necesarios para el desarrollo del 
 Es necesario tener en tools/ el compilador para micropython **mpy-cross**. El mismo se obtiene del source situado en https://github.com/micropython/micropython
 
 Para compilar el proyecto desde cero, simplemente ejecuta el comando `make`. Esto generará todos los binarios a partir de los archivos fuente disponibles en la carpeta /src.
-
+ 
 ```bash
 make
 ```
