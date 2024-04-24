@@ -187,16 +187,23 @@ class Programa:
             return
 
         try:
+            index=self.states.index(new_state)
             if self.st == "pause":
                 if new_state != "unpause":
                     raise ChangeStateError("Cannot switch from pause state without unpausing first")
 
+            # if we are un run and wish to cancel. we cancel:
+            #            1. init pins 
+            #            2. new state index = index of prev_st
+            #            3. prev state = "run"
             if new_state == "cancelled":
                 if self.st != "run":
                     raise ChangeStateError("Can only change from run state to cancelled") 
+                init_pins(self.rele_pins)
+                index=self.states.index(self.prev_st)
 
             self.prev_st = self.st
-            self.st = self.states[self.states.index(new_state)]
+            self.st = self.states[index]
             if new_delay_secs is not None:
                 if len(new_delay_secs) == 8:
                     self.delay_secs = new_delay_secs
