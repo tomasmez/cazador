@@ -1,9 +1,18 @@
 
 SRC_DIR=.
-BUILD_DIR=../bin/
+BUILD_DIR=../bin
 MPY=../tools/mpy-cross
 
-all: cazador templates
+all: clean cazador templates
+
+clean:
+	rm -rf $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/microdot
+	mkdir -p $(BUILD_DIR)/lib
+	mkdir -p $(BUILD_DIR)/lib/ds1307
+	mkdir -p $(BUILD_DIR)/templates
+
 
 mdot_microdot.mpy: $(SRC_DIR)/microdot/microdot.py
 	$(MPY) "$(SRC_DIR)/microdot/microdot.py" -o "$(BUILD_DIR)/microdot/microdot.mpy"
