@@ -120,7 +120,7 @@ class Programa:
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["reset", "run", "wait", "cancelled", "off", "pause", "unpause"]
+        self.states = ["reset", "run", "wait", "cancelled", "suspend", "off", "pause", "unpause"]
         self.st = "wait"
         self.prev_st = "off"
         self.counter = 1
@@ -279,7 +279,15 @@ class Programa:
                 toggle_port(self.rele_pins[self.counter])
                 print("Encendiendo rele", self.counter, "por", self.delay_secs[self.counter], "segundos")
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
-   
+        
+        if self.state() == "suspend":
+            riego_cancelado_json = read_json_config("riego_cancelado.json")
+            cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
+            if cancelado_hasta_str > get_current_time(): # el riego NO esta cancelado
+                self.state(self.prev_st)
+            else:
+                print(f"Riego suspendido hasta: {cancelado_hasta_str}")
+
     # returns status of running program.
     # tuple [ "programa", minutes remaining, zone number ]
     # returns None if it is not running

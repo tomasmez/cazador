@@ -46,6 +46,10 @@ async def index(request):
             print('RIEGO CANCELADO hasta:',cancelado_hasta_str)
             #dias_cancelados = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_cancelados"]} dias</p>'
             #request.form["dias_cancelados"] = dias_cancelados
+            p1.state("suspend")
+        elif p1.state() == "suspend":
+            p1.state("wait")
+
         request.form["cancelado_hasta"] = cancelado_hasta_str
         p1.state("pause")
         write_json_config(config,request.form)
@@ -78,8 +82,8 @@ async def cancelar_riego(request):
 @app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
     template = 'templates/config.html'
-#    print("tratando de cancelar")
-#    p1.state("cancelled")
+    print("tratando de cancelar")
+    p1.state("cancelled")
 
     if request.method == 'POST':
         post_time_str = request.form["datetime"]
