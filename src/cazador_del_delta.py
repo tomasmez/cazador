@@ -145,7 +145,9 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
 
     for num in range(1,4):
         try:
-            transformed_data[f'p{num}']['hora_comienzo'] = f"{riego_automatico_json[f'programa_{num}']['hora']}:{riego_automatico_json[f'programa_{num}']['minuto']}"
+            hora = riego_automatico_json[f'programa_{num}']['hora']
+            minuto = riego_automatico_json[f'programa_{num}']['minuto']
+            transformed_data['p' + str(num)]['hora_comienzo'] = f"{hora}:{minuto}"
         except:
             transformed_data[f'p{num}']['hora_comienzo'] = f"No configurada"
 

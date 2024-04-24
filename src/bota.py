@@ -23,7 +23,7 @@ def do_connect():
     if not sta_if.isconnected():
         print('connecting to network...')
         sta_if.active(True)
-        sta_if.connect('', '')
+        sta_if.connect('terrecabio', '79733458123')
         while not sta_if.isconnected():
             pass
     print('network config:', sta_if.ifconfig())
