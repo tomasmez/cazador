@@ -271,6 +271,18 @@ class Programa:
                 print("Encendiendo rele", self.counter, "por", self.delay_secs[self.counter], "segundos")
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
    
+    # returns status of running program.
+    # tuple [ "programa", minutes remaining, zone number ]
+    # returns None if it is not running
+    def program_running(self):
+        ret_val = None
+        if self.state() == "run":
+            ret_val = []
+            ret_val.append("programa")
+            ret_val.append(sum(self.delay_secs))
+            ret_val.append(self.counter)
+
+        return ret_val
 
     def interrupt_func(self, t):
         pulse = Pin(2, Pin.OUT)
@@ -292,12 +304,15 @@ class Programa:
             pass
         self.seconds += 1
         gc.collect()
-        print(f"Used ram:{gc.mem_alloc()}, Free ram:{gc.mem_free()}")
+        print(f"program runnning: {self.program_running()}, Free ram: {gc.mem_free()}")
+        
         pulse.value(0)
 
    # starts the timer for the programs.
     def run(self, periodo):
 
         self.tim.init(mode=Timer.PERIODIC, period=periodo, callback=self.interrupt_func)
+
+
 
 
