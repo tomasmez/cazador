@@ -321,7 +321,7 @@ class Programa:
             pass
         self.seconds += 1
         gc.collect()
-        #print(f"program runnning: {self.program_running()}, Free ram: {gc.mem_free()}")
+        print(f"program runnning: {self.program_running()}, Free ram: {gc.mem_free()}")
         
         pulse.value(0)
 
