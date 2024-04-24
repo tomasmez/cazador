@@ -173,6 +173,17 @@ class Programa:
             self.st = new_state
             self.reset_marker = rtc_current_time()
             self.reset_marker["time"][2] += 10
+            if self.reset_marker["time"][2] > 59:
+                self.reset_marker["time"][2] -= 60
+                self.reset_marker["time"][1] += 1
+                if self.reset_marker["time"][1] > 59:
+                    self.reset_marker["time"][1] -= 60
+                    self.reset_marker["time"][0] += 1
+                    if self.reset_marker["time"][0] > 23:
+                        self.reset_marker["time"][0] -= 24
+                        self.reset_marker["date"][2] += 1
+
+
             return
 
         try:
