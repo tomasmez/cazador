@@ -120,7 +120,7 @@ class Programa:
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["reset", "run", "wait", "off", "pause", "unpause"]
+        self.states = ["reset", "run", "wait", "cancelled", "off", "pause", "unpause"]
         self.st = "wait"
         self.prev_st = "off"
         self.counter = 1
@@ -187,16 +187,24 @@ class Programa:
             return
 
         try:
+            index=self.states.index(new_state)
             if self.st == "pause":
                 if new_state != "unpause":
                     raise ChangeStateError("Cannot switch from pause state without unpausing first")
 
+            # if we are un run and wish to cancel. we cancel:
+            #            1. init pins 
+            #            2. new state index = index of prev_st
+            #            3. prev state = "run"
             if new_state == "cancelled":
                 if self.st != "run":
                     raise ChangeStateError("Can only change from run state to cancelled") 
+                init_pins(self.rele_pins)
+                self.counter = 1
+                index=self.states.index(self.prev_st)
 
             self.prev_st = self.st
-            self.st = self.states[self.states.index(new_state)]
+            self.st = self.states[index]
             if new_delay_secs is not None:
                 if len(new_delay_secs) == 8:
                     self.delay_secs = new_delay_secs
@@ -235,17 +243,18 @@ class Programa:
 
             for program in next_time:
                 if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
-                    delay_mins = read_minutes(program)
-                    self.delay_secs = [x * 60 for x in delay_mins]
+                    if now_time["time"][2] < 2:
+                        delay_mins = read_minutes(program)
+                        self.delay_secs = [x * 60 for x in delay_mins]
 
-                    #special case, run a program that has 0 minutes to run.
-                    # need to skip this run.
-                    if sum(self.delay_secs) != 0:
-                        print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
-                        print(self.delay_secs)
+                        #special case, run a program that has 0 minutes to run.
+                        # need to skip this run.
+                        if sum(self.delay_secs) != 0:
+                            print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
+                            print(self.delay_secs)
 
-                        toggle_port(self.rele_pins[0])
-                        self.state("run")
+                            toggle_port(self.rele_pins[0])
+                            self.state("run")
 
 
         if(self.state() == "cancelled"):
