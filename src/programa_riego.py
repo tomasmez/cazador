@@ -60,7 +60,7 @@ def rtc_current_time():
     ds1307 = DS1307(addr=I2C_ADDR, i2c=i2c)
 
     # Get the current RTC time as a tuple (year, month, day, hour, minute, second, weekday, yearday)
-    ret_val =  { "time" : [ds1307.hour, ds1307.minute], "date" : [ds1307.year, ds1307.month, ds1307.day] }
+    ret_val =  { "time" : [ds1307.hour, ds1307.minute, ds1307.second], "date" : [ds1307.year, ds1307.month, ds1307.day] }
 
     return ret_val
 
@@ -117,10 +117,10 @@ class Programa:
 
     def __init__(self, Rele_pins):
         
-
+        self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["run", "wait", "off", "pause", "unpause"]
+        self.states = ["reset", "run", "wait", "off", "pause", "unpause"]
         self.st = "wait"
         self.prev_st = "off"
         self.counter = 1
@@ -169,6 +169,11 @@ class Programa:
                 self.st = self.prev_st
             return self.st
                 
+        if new_state == "reset":
+            self.st = new_state
+            self.reset_marker = rtc_current_time()
+            self.reset_marker["time"][2] += 10
+            return
 
         try:
             if self.st == "pause":
@@ -195,6 +200,16 @@ class Programa:
 
 
     def state_machine(self):
+        now_time = rtc_current_time()
+
+        if self.state() == "reset":
+            from machine import reset
+            print(f"now = {now_time}")
+            print(f"reset = {self.reset_marker}")
+            if now_time["time"] > self.reset_marker["time"]:
+               reset()
+
+
         if self.state() == "pause":
             return
 
@@ -203,13 +218,12 @@ class Programa:
         if self.state() == "off":
             return;
 
-        now_time = rtc_current_time()
 
         if self.state() == "wait":
             next_time = programa_get_next_time()
 
             for program in next_time:
-                if next_time[program] == now_time["time"]:
+                if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
                     delay_mins = read_minutes(program)
                     self.delay_secs = [x * 60 for x in delay_mins]
 

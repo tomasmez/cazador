@@ -92,8 +92,10 @@ async def seteo_hora(request):
 
 @app.route('/hard_reset',)
 async def hard_reset(request):
-    from machine import reset
-    reset()
+    p1.state("reset")
+    return redirect('/')    
+#    from machine import reset
+#    reset()
 
 @app.route('/horas_arranque', methods=['GET', 'POST'])
 async def horas_arranque(request):
