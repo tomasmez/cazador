@@ -25,8 +25,21 @@ async def index(request):
     template = 'templates/index.html'
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
-    my_dict["riego_programado"] = json_to_html_table(read_json_config_programa_manual("riego_automatico.json"))
-    my_dict["programas_configurados"] = json_to_html_table(transform_seteo_programas_json(read_json_config_programas("seteo_programas.json")))
+    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
+    print('---riego_automatico_json---')
+    print(riego_automatico_json)
+    print('----')
+    #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
+    seteo_programas_json = read_json_config_programas("seteo_programas.json")
+    print('---seteo_programas_json---')
+    print(seteo_programas_json)
+    print('----')
+    seteo_programas_json_transformed = transform_seteo_programas_json(seteo_programas_json,riego_automatico_json)
+    print('---seteo_programas_transformed---')
+    print(seteo_programas_json)
+    print('----')   
+    
+    my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     riego_cancelado_json = read_json_config("riego_cancelado.json")
     print(riego_cancelado_json,type(riego_cancelado_json))
     try:
@@ -87,7 +100,7 @@ async def seteo_hora(request):
 
     if request.method == 'POST':
         post_time_str = request.form["datetime"]
-        print('-->',type(post_time_str),post_time_str)
+        #print('-->',type(post_time_str),post_time_str)
         try:
             set_local_time(post_time_str)
         except Exception as ex:
@@ -116,6 +129,11 @@ async def horas_arranque(request):
         return redirect('/')
     else:
         return send_file(template)
+        
+@app.route('/horas_arranque_json', methods=['GET'])
+async def horas_arranque_json(request):
+    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
+    return riego_automatico_json
     
 @app.route('/seteo_riego_manual', methods=['GET', 'POST'])
 async def seteo_riego_manual(request):
