@@ -132,6 +132,20 @@ def read_json_config_programas(file_path):
         return {}
         
 
+def transform_seteo_programas_json(input_json):
+    # transforma los programas en algo mas facil de entender
+    transformed_data = {"p1": {}, "p2": {}, "p3": {}}
+    #print('---->',type(input_json),input_json)
+    for key, value in input_json.items():
+        print('*****',key,value)
+        if not 'hora' in key:
+            participant, zone = key.split("-")[0], key.split("-")[1]
+            if not value[0] == '00':
+                transformed_data[participant][zone] = f'{value[0]} min'
+    
+    return transformed_data
+
+
 def read_json_config_programa_manual(file_path):
     try:
         with open(file_path, 'r') as file:

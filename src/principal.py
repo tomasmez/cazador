@@ -5,7 +5,7 @@ gc.enable()
 
 
 from microdot import Microdot, Response, send_file,redirect
-from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_automatico,read_json_config_programa_manual
+from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_automatico,read_json_config_programa_manual,transform_seteo_programas_json
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
 from programa_riego import Programa, toggle_port
 
@@ -26,7 +26,7 @@ async def index(request):
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
     my_dict["riego_programado"] = json_to_html_table(read_json_config_programa_manual("riego_automatico.json"))
-    my_dict["programas_configurados"] = json_to_html_table(read_json_config_programas("seteo_programas.json"))
+    my_dict["programas_configurados"] = json_to_html_table(transform_seteo_programas_json(read_json_config_programas("seteo_programas.json")))
     riego_cancelado_json = read_json_config("riego_cancelado.json")
     print(riego_cancelado_json,type(riego_cancelado_json))
     try:
