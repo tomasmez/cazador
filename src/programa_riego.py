@@ -120,7 +120,7 @@ class Programa:
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["reset", "run", "wait", "off", "pause", "unpause"]
+        self.states = ["reset", "run", "wait", "cancelled", "off", "pause", "unpause"]
         self.st = "wait"
         self.prev_st = "off"
         self.counter = 1
@@ -243,17 +243,18 @@ class Programa:
 
             for program in next_time:
                 if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
-                    delay_mins = read_minutes(program)
-                    self.delay_secs = [x * 60 for x in delay_mins]
+                    if now_time["time"][2] < 2:
+                        delay_mins = read_minutes(program)
+                        self.delay_secs = [x * 60 for x in delay_mins]
 
-                    #special case, run a program that has 0 minutes to run.
-                    # need to skip this run.
-                    if sum(self.delay_secs) != 0:
-                        print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
-                        print(self.delay_secs)
+                        #special case, run a program that has 0 minutes to run.
+                        # need to skip this run.
+                        if sum(self.delay_secs) != 0:
+                            print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
+                            print(self.delay_secs)
 
-                        toggle_port(self.rele_pins[0])
-                        self.state("run")
+                            toggle_port(self.rele_pins[0])
+                            self.state("run")
 
 
         if(self.state() == "cancelled"):
