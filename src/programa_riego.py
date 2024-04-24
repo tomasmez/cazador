@@ -200,6 +200,7 @@ class Programa:
                 if self.st != "run":
                     raise ChangeStateError("Can only change from run state to cancelled") 
                 init_pins(self.rele_pins)
+                self.counter = 1
                 index=self.states.index(self.prev_st)
 
             self.prev_st = self.st
