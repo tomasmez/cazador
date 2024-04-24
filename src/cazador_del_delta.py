@@ -132,19 +132,24 @@ def read_json_config_programas(file_path):
         return {}
         
 
-def transform_seteo_programas_json(input_json):
-    # transforma los programas en algo mas facil de entender
+def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
     transformed_data = {"p1": {}, "p2": {}, "p3": {}}
     #print('---->',type(input_json),input_json)
-    for key, value in input_json.items():
-        print('*****',key,value)
+    for key, value in seteo_programas_json.items():
+        #print('*****',key,value)
         if not 'hora' in key:
             participant, zone = key.split("-")[0], key.split("-")[1]
+            print(participant,zone)
             if not value[0] == '00':
                 transformed_data[participant][zone] = f'{value[0]} min'
-    
-    return transformed_data
 
+    for num in range(1,4):
+        try:
+            transformed_data[f'p{num}']['hora_comienzo'] = f"{riego_automatico_json[f'programa_{num}']['hora']}:{riego_automatico_json[f'programa_{num}']['minuto']}"
+        except:
+            transformed_data[f'p{num}']['hora_comienzo'] = f"No configurada"
+
+    return transformed_data
 
 def read_json_config_programa_manual(file_path):
     try:
@@ -198,7 +203,10 @@ def write_json_config(file_path, json_data):
 def dict_to_html_table(input_dict):
     html_table = "<table>\n"
     for key, value in input_dict.items():
-        html_table += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
+        if 'hora_comienzo' == key:
+            html_table += f"<tr><td><mark>{key}</td><td><mark>{value}</td></tr>\n"
+        else:
+            html_table += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
     html_table += "</table>"
     return html_table
         
