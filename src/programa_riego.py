@@ -299,7 +299,7 @@ class Programa:
         if self.state() == "suspend":
             riego_cancelado_json = read_json_config("riego_cancelado.json")
             cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
-            if cancelado_hasta_str > get_current_time(): # el riego NO esta cancelado
+            if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
                 self.state(self.prev_st)
             else:
                 print(f"Riego suspendido hasta: {cancelado_hasta_str}")
