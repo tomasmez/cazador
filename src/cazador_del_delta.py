@@ -87,8 +87,8 @@ def set_local_time(datetime_str):
     hour, minute = map(int, time.split(':'))
     
     # Convert the datetime components into a UNIX timestamp
-    timestamp = (year, month, day, hour, minute, 0, 0, 0)
-    print('Setting local time to',(year, month, day, hour, minute, 0, 0, 0))
+    timestamp = (year, month, day, hour, minute, 1, 0, 0)
+    print('Setting local time to',(year, month, day, hour, minute, 1, 0, 0))
     # Set the local time
     # DS1307 on 0x68
     I2C_ADDR = 0x68     # DEC 104, HEX 0x68

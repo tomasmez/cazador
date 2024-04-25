@@ -49,6 +49,30 @@ def programa_get_next_time():
             pass
     return ret_data
 
+# 0 = domingo, 6 = sabado
+def rtc_weekday(now):
+
+    MONTH_TABLE = [999, 0, 3, 3, 6, 1, 4, 6, 2, 5, 0, 3, 5 ]
+    CENTURY_TABLE = [0, 5, 3, 1, 0 ]
+    
+    y_2d = now["date"][0] % 100 
+    century_index = int((now["date"][0] - y_2d )/ 100 ) % 4
+
+
+    one = ( now["date"][2] + MONTH_TABLE[now["date"][1]] ) % 7
+    two = y_2d % 28 + int((y_2d - (y_2d % 4))/4) + CENTURY_TABLE[century_index] 
+    if now["date"][1] <= 2:
+        if y_2d % 4 == 0:
+            two -= 1
+    
+    three = (one + two - 1) % 7
+    
+    return three
+
+
+
+
+    return 1
 
 def rtc_current_time():
     from machine import I2C, Pin
@@ -100,7 +124,20 @@ def temperature_read(ds_sensor, roms, ticker):
             except:
                 print(f"ERR: falied to read {rom}")
         return ret_val
+    
+def dia_de_riego(time):
+    try:
+        calendario_de_riego = read_json_config("calendario_de_riego.json")
+    except:
+        return True  # si no hay archivo. permito regar
 
+    wday = rtc_weekday(time)
+    print(f"dia_de_riego: {wday}")
+    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+
+    if calendario_de_riego[DIAS[wday]][0] == "R":
+        return True
+    return False
 
 """
 Class Programa ejecuta el timer que realiza la función 
@@ -142,6 +179,10 @@ class Programa:
         self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
         self.roms = self.ds_sensor.scan()
         print('Found DS devices: ', self.roms)
+
+
+
+
 
 # Possible states for the state machine:
 # wait: program is waiting for a calendar alarm.
@@ -264,22 +305,25 @@ class Programa:
 
 
         if self.state() == "wait":
-            next_time = programa_get_next_time()
 
-            for program in next_time:
-                if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
-                    if now_time["time"][2] < 2:
-                        delay_mins = read_minutes(program)
-                        self.delay_secs = [x * 60 for x in delay_mins]
+            if dia_de_riego(now_time):
 
-                        #special case, run a program that has 0 minutes to run.
-                        # need to skip this run.
-                        if sum(self.delay_secs) != 0:
-                            print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
-                            print(self.delay_secs)
+                next_time = programa_get_next_time()
 
-                            toggle_port(self.rele_pins[0])
-                            self.state("run")
+                for program in next_time:
+                    if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
+                        if now_time["time"][2] < 2:
+                            delay_mins = read_minutes(program)
+                            self.delay_secs = [x * 60 for x in delay_mins]
+
+                            #special case, run a program that has 0 minutes to run.
+                            # need to skip this run.
+                            if sum(self.delay_secs) != 0:
+                                print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
+                                print(self.delay_secs)
+
+                                toggle_port(self.rele_pins[0])
+                                self.state("run")
 
 
         if(self.state() == "cancelled"):

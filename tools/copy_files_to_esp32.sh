@@ -1,5 +1,5 @@
 #!/bin/bash
-
+killall picocom
 # Specify the port of your device
 PORT="/dev/ttyUSB0"
 

@@ -234,7 +234,7 @@ class DS1307(object):
         :returns:   Weekday of RTC
         :rtype:     int
         """
-        return self.datetime[5]
+        return self.datetime[6]
 
     @property
     def yearday(self) -> int:
