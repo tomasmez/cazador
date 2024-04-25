@@ -43,7 +43,10 @@ async def index(request):
     print('---seteo_programas_transformed---')
     print(calendario_json)
     print('----')      
-    seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
+    try:
+        seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
+    except:
+        pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     riego_cancelado_json = read_json_config("riego_cancelado.json")
