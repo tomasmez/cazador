@@ -133,7 +133,7 @@ def dia_de_riego(time):
 
     wday = rtc_weekday(time)
     #print(f"dia_de_riego: {wday}")
-    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
 
     try:
         if calendario_de_riego[DIAS[wday]][0] == "on":
@@ -328,6 +328,9 @@ class Programa:
 
                                 toggle_port(self.rele_pins[0])
                                 self.state("run")
+
+            else:
+                Print("No es un dia de riego habilitado!!")
 
 
         if(self.state() == "cancelled"):
