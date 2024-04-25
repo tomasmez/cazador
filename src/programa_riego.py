@@ -127,7 +127,7 @@ def temperature_read(ds_sensor, roms, ticker):
     
 def dia_de_riego(time):
     try:
-        calendario_de_riego = read_json_config("calendario_de_riego.json")
+        calendario_de_riego = read_json_config("riego_automatico.json")
     except:
         return True  # si no hay archivo. permito regar
 
@@ -135,8 +135,11 @@ def dia_de_riego(time):
     print(f"dia_de_riego: {wday}")
     DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
 
-    if calendario_de_riego[DIAS[wday]][0] == "R":
-        return True
+    try:
+        if calendario_de_riego[DIAS[wday]][0] == "on":
+            return True
+    except:
+        return False
     return False
 
 """
