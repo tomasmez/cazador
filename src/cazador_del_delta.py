@@ -133,14 +133,15 @@ def read_json_config_programas(file_path):
         
 
 def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
-    transformed_data = {"p1": {}, "p2": {}, "p3": {}}
+    transformed_data = {"p1": {}, "p2": {}, "p3": {}, "dias_habilitados": []}
+
     #print('---->',type(input_json),input_json)
     try:
         for key, value in seteo_programas_json.items():
             #print('*****',key,value)
             if not 'hora' in key:
                 participant, zone = key.split("-")[0], key.split("-")[1]
-                print(participant,zone)
+                #print(participant,zone)
                 if not value[0] == '00':
                     transformed_data[participant][zone] = f'{value[0]} min'
 
@@ -154,7 +155,7 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
     except:
         # no initial config issue
         pass
-
+    
     return transformed_data
 
 def read_json_config_programa_manual(file_path):
@@ -173,6 +174,28 @@ def read_json_config_programa_manual(file_path):
     except Exception as e:
         print('Error',e)
         return {}
+
+def read_calendario(file_path):
+    try:
+        calendario = {}
+        dias_habilitados = []
+        with open(file_path, 'r') as file:
+            data = ujson.load(file)
+            try:
+                # Extract the days of the week that are 'on' and add them to dias_habilidatos
+                for key,value in data.keys():
+                    if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]:
+                        if value == ["on"]:  # Check if the value is "on"
+                            dias_habilitados.append(key)
+                calendario["dias_habilitados"] = dias_habilitados
+            except Exception as ex:
+                print(f'Error leyendo calendario {file_path}:{ex}')        
+     
+            file.close()
+        return calendario
+    except Exception as e:
+        print('Error',e)
+        return {}    
 
 
 def read_json_config_programa_automatico(file_path):
