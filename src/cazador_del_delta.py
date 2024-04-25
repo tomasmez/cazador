@@ -181,12 +181,11 @@ def read_calendario(file_path):
         dias_habilitados = []
         with open(file_path, 'r') as file:
             data = ujson.load(file)
+            print('calendario_data',data)
+            print('---end---')
             try:
                 # Extract the days of the week that are 'on' and add them to dias_habilidatos
-                for key,value in data.keys():
-                    if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]:
-                        if value == ["on"]:  # Check if the value is "on"
-                            dias_habilitados.append(key)
+                dias_habilitados = [key for key in data.keys() if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"] and data[key] == ["on"]]
                 calendario["dias_habilitados"] = dias_habilitados
             except Exception as ex:
                 print(f'Error leyendo calendario {file_path}:{ex}')        
