@@ -127,16 +127,19 @@ def temperature_read(ds_sensor, roms, ticker):
     
 def dia_de_riego(time):
     try:
-        calendario_de_riego = read_json_config("calendario_de_riego.json")
+        calendario_de_riego = read_json_config("riego_automatico.json")
     except:
         return True  # si no hay archivo. permito regar
 
     wday = rtc_weekday(time)
-    print(f"dia_de_riego: {wday}")
-    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+    #print(f"dia_de_riego: {wday}")
+    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
 
-    if calendario_de_riego[DIAS[wday]][0] == "R":
-        return True
+    try:
+        if calendario_de_riego[DIAS[wday]][0] == "on":
+            return True
+    except:
+        return False
     return False
 
 """
@@ -162,6 +165,7 @@ class Programa:
         self.counter = 1
         self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
         self.tim=Timer(0)
+        self.temp = 0.0 #temperatura del ds18b20
 
         init_pins(Rele_pins)
 
@@ -325,6 +329,9 @@ class Programa:
                                 toggle_port(self.rele_pins[0])
                                 self.state("run")
 
+            else:
+                Print("No es un dia de riego habilitado!!")
+
 
         if(self.state() == "cancelled"):
            print("Riego Cancelado")
@@ -388,7 +395,8 @@ class Programa:
         try:
             for temp in temps:
                 if isinstance(temp, float):
-                    print(f"Temperature: {temp:2.2f} C")
+                    self.temp = temp
+                   # print(f"Temperature: {temp:2.2f} C")
         except TypeError:
             pass
         self.seconds += 1
