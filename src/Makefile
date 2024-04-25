@@ -8,17 +8,17 @@ all: clean cazador templates
 clean:
 	rm -rf $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/microdot
 	mkdir -p $(BUILD_DIR)/lib
+	mkdir -p $(BUILD_DIR)/lib/microdot
 	mkdir -p $(BUILD_DIR)/lib/ds1307
 	mkdir -p $(BUILD_DIR)/templates
 
 
-mdot_microdot.mpy: $(SRC_DIR)/microdot/microdot.py
-	$(MPY) "$(SRC_DIR)/microdot/microdot.py" -o "$(BUILD_DIR)/microdot/microdot.mpy"
+mdot_microdot.mpy: $(SRC_DIR)/lib/microdot/microdot.py
+	$(MPY) "$(SRC_DIR)/lib/microdot/microdot.py" -o "$(BUILD_DIR)/lib/microdot/microdot.mpy"
 
-mdot___init__.mpy: $(SRC_DIR)/microdot/__init__.py
-	$(MPY) "$(SRC_DIR)/microdot/__init__.py" -o "$(BUILD_DIR)/microdot/__init__.mpy"
+mdot___init__.mpy: $(SRC_DIR)/lib/microdot/__init__.py
+	$(MPY) "$(SRC_DIR)/lib/microdot/__init__.py" -o "$(BUILD_DIR)/lib/microdot/__init__.mpy"
 
 
 boot.mpy: $(SRC_DIR)/boot.py $(SRC_DIR)/bota.py
@@ -56,10 +56,12 @@ ds1307: ds_ds1307.mpy ds___init__.mpy ds_version.mpy
 
 microdot: mdot_microdot.mpy mdot___init__.mpy
 
-cazador: main.mpy boot.mpy microdot ds1307 programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy
+cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy
 
 
 install: cazador templates
-	#killall picocom 2> /dev/null
+	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
+
+install_dep: microdot ds1307 cazador templates
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
