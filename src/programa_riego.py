@@ -330,7 +330,7 @@ class Programa:
                                 self.state("run")
 
             else:
-                Print("No es un dia de riego habilitado!!")
+                print("No es un dia de riego habilitado!!")
 
 
         if(self.state() == "cancelled"):
