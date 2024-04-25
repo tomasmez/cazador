@@ -101,7 +101,6 @@ def temperature_read(ds_sensor, roms, ticker):
                 print(f"ERR: falied to read {rom}")
         return ret_val
 
-       
 
 """
 Class Programa ejecuta el timer que realiza la función 
@@ -121,13 +120,23 @@ class Programa:
         self.seconds = 0
         self.rele_pins = Rele_pins
         self.states = ["reset", "run", "wait", "cancelled", "suspend", "off", "pause", "unpause"]
-        self.st = "wait"
-        self.prev_st = "off"
+        self.st = ""
+        self.prev_st = ""
         self.counter = 1
         self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
         self.tim=Timer(0)
 
         init_pins(Rele_pins)
+
+        # check if its suspended.
+        riego_cancelado_json = read_json_config("riego_cancelado.json")
+        cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
+        if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
+            self.st = "wait"
+            self.prev_st = "off"
+        else:
+            self.st = "suspend"
+            self.prev_st = "wait"
 
         ds_pin = Pin(4)
         self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
@@ -300,7 +309,7 @@ class Programa:
             riego_cancelado_json = read_json_config("riego_cancelado.json")
             cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
             if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
-                self.state(self.prev_st)
+                self.state("wait")
             else:
                 print(f"Riego suspendido hasta: {cancelado_hasta_str}")
 
