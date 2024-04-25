@@ -132,7 +132,7 @@ def dia_de_riego(time):
         return True  # si no hay archivo. permito regar
 
     wday = rtc_weekday(time)
-    print(f"dia_de_riego: {wday}")
+    #print(f"dia_de_riego: {wday}")
     DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
 
     try:
@@ -165,6 +165,7 @@ class Programa:
         self.counter = 1
         self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
         self.tim=Timer(0)
+        self.temp = 0.0 #temperatura del ds18b20
 
         init_pins(Rele_pins)
 
@@ -391,7 +392,8 @@ class Programa:
         try:
             for temp in temps:
                 if isinstance(temp, float):
-                    print(f"Temperature: {temp:2.2f} C")
+                    self.temp = temp
+                   # print(f"Temperature: {temp:2.2f} C")
         except TypeError:
             pass
         self.seconds += 1
