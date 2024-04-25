@@ -124,7 +124,7 @@ class Programa:
         self.st = "wait"
         self.prev_st = "off"
         self.counter = 1
-        self.delay_secs = [0, 1, 3, 0, 10, 5, 1, 1]
+        self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
         self.tim=Timer(0)
 
         init_pins(Rele_pins)
@@ -206,8 +206,7 @@ class Programa:
             self.prev_st = self.st
             self.st = self.states[index]
             if new_delay_secs is not None:
-                if len(new_delay_secs) == 8:
-                    self.delay_secs = new_delay_secs
+                self.delay_secs = new_delay_secs
             
         except ValueError:
             print("programa.state new_state not valid:",new_state)
@@ -216,6 +215,23 @@ class Programa:
             return self.st
         return self.st
 
+    def run_program(self, program_name):
+        
+        if self.state() == "run":
+            print("WARN: run_program cannot execute if running already. cancel program first.")
+            return
+
+        # need to check if program_name exists.
+        delay_mins = read_minutes(program_name)
+        self.delay_secs = [x * 60 for x in delay_mins]
+
+        #special case, run a program that has 0 minutes to run.
+        # need to skip this run.
+        if sum(self.delay_secs) != 0:
+            print(f"Starting manual program: {program_name}" )
+            print(self.delay_secs)
+            toggle_port(self.rele_pins[0])
+            self.state("run")
 
 
     def state_machine(self):
@@ -291,6 +307,9 @@ class Programa:
     # returns status of running program.
     # tuple [ "programa", minutes remaining, zone number ]
     # returns None if it is not running
+    # TODO: now it has first value hardcoded.
+    #       need to see how it is best to get this info.
+
     def program_running(self):
         ret_val = None
         if self.state() == "run":
