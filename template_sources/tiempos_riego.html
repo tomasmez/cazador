@@ -235,7 +235,54 @@
       document.addEventListener('DOMContentLoaded', populateDropdowns);
     </script>
     
-    
+    <script>
+
+      // Define the URL of the Flask endpoint
+      const endpointUrl = '/return_json_file?file=seteo_programas.json';
+      
+      // Make a GET request to the Flask endpoint
+      fetch(endpointUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Update dropdown selects for each program and zone based on JSON data
+          ['p1', 'p2', 'p3'].forEach(program => {
+            for (let zone = 1; zone <= 7; zone++) {
+              const selectId = `${program}-zone${zone}-minutes`;
+              const selectElement = document.getElementById(selectId);
+              if (selectElement) {
+                const defaultValue = data[`${program}-zone${zone}-minutes`][0] || ''; // Default value from JSON
+                updateSelectOptions(selectElement, 0, 59, defaultValue);
+              }
+            }
+          });
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+      
+      // Function to update select options with start and end values and set default selected value
+      function updateSelectOptions(selectElement, startValue, endValue, defaultValue) {
+        selectElement.innerHTML = ''; // Clear existing options
+      
+        for (let i = startValue; i <= endValue; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i.toString().padStart(2, '0'); // Add leading zero if needed
+          if (i.toString() === defaultValue) {
+            option.selected = true; // Set default selected value
+          }
+          selectElement.appendChild(option);
+        }
+      }
+      
+      
+      </script>    
+          
 
 </body>
 </html>
