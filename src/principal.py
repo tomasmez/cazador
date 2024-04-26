@@ -56,7 +56,7 @@ async def index(request):
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     print(globales.riego_cancelado,type(globales.riego_cancelado))
     try:
-        cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
+        cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
         if cancelado_hasta_str > get_current_time(): # el riego NO esta cancelado
             print('CONFIRMADO Riego cancelado hasta',cancelado_hasta_str)
             my_dict["riego_cancelado"] = f"<mark>{cancelado_hasta_str}</mark>"
