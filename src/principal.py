@@ -1,11 +1,15 @@
 import sys
 import gc
+import ujson
+import globales
+from globales import read_json_config
+globales.init()
 
 gc.enable()
 
 
 from microdot import Microdot, Response, send_file,redirect
-from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_automatico,read_json_config_programa_manual,transform_seteo_programas_json
+from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_manual,transform_seteo_programas_json
 from cazador_del_delta import read_calendario
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
 from programa_riego import Programa, toggle_port
@@ -26,12 +30,12 @@ async def index(request):
     template = 'templates/index.html'
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
-    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
+    riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
     print('---riego_automatico_json---')
     print(riego_automatico_json)
     print('----')
     #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
-    seteo_programas_json = read_json_config_programas("seteo_programas.json")
+    seteo_programas_json = read_json_config_programas(globales.seteo_programas)
     print('---seteo_programas_json---')
     print(seteo_programas_json)
     print('----')
@@ -39,7 +43,7 @@ async def index(request):
     print('---seteo_programas_transformed---')
     print(seteo_programas_json)
     print('----')   
-    calendario_json = read_calendario("riego_automatico.json")
+    calendario_json = read_calendario(globales.riego_automatico)
     print('---seteo_programas_transformed---')
     print(calendario_json)
     print('----')      
@@ -49,8 +53,7 @@ async def index(request):
         pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
-    riego_cancelado_json = read_json_config("riego_cancelado.json")
-    print(riego_cancelado_json,type(riego_cancelado_json))
+    print(globales.riego_cancelado,type(globales.riego_cancelado))
     try:
         cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
         if cancelado_hasta_str > get_current_time(): # el riego NO esta cancelado
@@ -75,6 +78,7 @@ async def index(request):
         request.form["cancelado_hasta"] = cancelado_hasta_str
         p1.state("pause")
         write_json_config(config,request.form)
+        globales.riego_cancelado = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -137,6 +141,8 @@ async def horas_arranque(request):
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
         write_json_config(config,request.form)
+        print(request.form)
+        globales.riego_automatico = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -144,7 +150,7 @@ async def horas_arranque(request):
         
 @app.route('/horas_arranque_json', methods=['GET'])
 async def horas_arranque_json(request):
-    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
+    riego_automatico_json = read_json_config_programa_manual(riego_automatico)
     return riego_automatico_json
     
 @app.route('/seteo_riego_manual', methods=['GET', 'POST'])
@@ -155,6 +161,7 @@ async def seteo_riego_manual(request):
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
         write_json_config(config,request.form)
+        globales.riego_manual = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -169,6 +176,7 @@ async def seteo_programas(request):
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
         write_json_config(config,request.form)
+        globales.seteo_programas = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:

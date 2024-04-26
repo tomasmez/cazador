@@ -4,7 +4,7 @@ import usocket as socket
 import utime
 import urequests
 from machine import Pin
-from cazador_del_delta import read_json_config
+from globales import read_json_config
 # Create Access Point
 ap_ssid = "ESP32_AP"
 ap_password = ""

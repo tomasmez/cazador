@@ -1,9 +1,11 @@
 
-from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config,write_json_config,set_local_time,read_json_config_programas, read_json_config_programa_manual
+from cazador_del_delta import render_template,get_current_time,json_to_html_table,write_json_config,set_local_time,read_json_config_programas, read_json_config_programa_manual
 
 from machine import Timer, Pin
 import time, onewire, ds18x20
 import gc
+import globales
+from globales import read_json_config
 
 class ChangeStateError(Exception):
     pass
@@ -17,7 +19,8 @@ def toggle_port(R_pin):
 
 def read_minutes(programa="programa_1"):
 
-        s_pr = read_json_config_programas("seteo_programas.json")
+        global seteo_programas
+        s_pr = read_json_config_programas(globales.seteo_programas)
         
         p_n = programa.split("_")[1]
 
@@ -36,7 +39,7 @@ def read_minutes(programa="programa_1"):
 
 def programa_get_next_time():
     
-    jdata = read_json_config_programa_manual("riego_automatico.json")
+    jdata = read_json_config_programa_manual(globales.riego_automatico)
     #print(jdata)
 
     ret_data = {}
@@ -127,7 +130,7 @@ def temperature_read(ds_sensor, roms, ticker):
     
 def dia_de_riego(time):
     try:
-        calendario_de_riego = read_json_config("riego_automatico.json")
+        calendario_de_riego = globales.riego_automatico
     except:
         return True  # si no hay archivo. permito regar
 
@@ -151,11 +154,12 @@ depende fuertemente de cazador_del_delta.py que administra
 la interfaz con el usuario (web server).
 """
 
+
 class Programa:
 
 
     def __init__(self, Rele_pins):
-        
+
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
@@ -170,8 +174,7 @@ class Programa:
         init_pins(Rele_pins)
 
         # check if its suspended.
-        riego_cancelado_json = read_json_config("riego_cancelado.json")
-        cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
+        cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
         if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
             self.st = "wait"
             self.prev_st = "off"
@@ -357,8 +360,7 @@ class Programa:
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
         if self.state() == "suspend":
-            riego_cancelado_json = read_json_config("riego_cancelado.json")
-            cancelado_hasta_str = riego_cancelado_json["cancelado_hasta"][0]
+            cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
             if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
                 self.state("wait")
             else:
