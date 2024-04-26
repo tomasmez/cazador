@@ -163,7 +163,7 @@ class Programa:
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["reset", "run", "wait", "cancelled", "suspend", "off", "pause", "unpause"]
+        self.states = ["reset","manual_run", "run", "wait", "cancelled", "suspend", "off", "pause", "unpause"]
         self.st = ""
         self.prev_st = ""
         self.counter = 1
@@ -199,6 +199,10 @@ class Programa:
 #       the program checks the time and runs if the time matches 
 #       the start time of a given program.
 #       it sets the staet to run and loads the delay_secs variable.
+# manual_run: this state is entered from run_program.
+#             it sets the delay secs when called and then 
+#             under this state we start the program instead of
+#             doing it from the wait state
 # run:  the program is running a watering cycle.
 #       it decrements delay_secs 1 sec at a time from each station
 #       until it reaches 0 on all stations. then it powers off the
@@ -247,24 +251,16 @@ class Programa:
             return
 
         try:
-            index=self.states.index(new_state)
             if self.st == "pause":
                 if new_state != "unpause":
                     raise ChangeStateError("Cannot switch from pause state without unpausing first")
 
-            # if we are un run and wish to cancel. we cancel:
-            #            1. init pins 
-            #            2. new state index = index of prev_st
-            #            3. prev state = "run"
             if new_state == "cancelled":
                 if self.st != "run":
                     raise ChangeStateError("Can only change from run state to cancelled") 
-                init_pins(self.rele_pins)
-                self.counter = 1
-                index=self.states.index(self.prev_st)
 
             self.prev_st = self.st
-            self.st = self.states[index]
+            self.st = new_state
             if new_delay_secs is not None:
                 self.delay_secs = new_delay_secs
             
@@ -288,10 +284,7 @@ class Programa:
         #special case, run a program that has 0 minutes to run.
         # need to skip this run.
         if sum(self.delay_secs) != 0:
-            print(f"Starting manual program: {program_name}" )
-            print(self.delay_secs)
-            toggle_port(self.rele_pins[0])
-            self.state("run")
+            self.state("manual_run")
 
 
     def state_machine(self):
@@ -312,7 +305,12 @@ class Programa:
 
         if self.state() == "off":
             return;
-
+        
+        if self.state() == "manual_run":
+            print(f"Starting manual program." )
+            print(self.delay_secs)
+            toggle_port(self.rele_pins[0])
+            self.state("run")
 
         if self.state() == "wait":
 
@@ -342,7 +340,8 @@ class Programa:
         if(self.state() == "cancelled"):
            print("Riego Cancelado")
            init_pins(self.rele_pins)
-           self.state(self.prev_st)
+           self.counter = 1
+           self.state("wait")
 
         if(self.state() == "run"):       
             pin = Pin(self.rele_pins[self.counter], Pin.OUT)
@@ -353,7 +352,7 @@ class Programa:
                 self.counter += 1
                 if self.counter == 8:
                     self.counter = 1
-                    self.state(self.prev_st)
+                    self.state("wait")
                     toggle_port(self.rele_pins[0])
                     return
 
