@@ -130,6 +130,24 @@
         return response.json();
     })
     .then(data => {
+
+        ['programa_1', 'programa_2', 'programa_3'].forEach(program => {
+            if (data[program] && data[program][0] === "on") {
+            // Program is active, update start hour and minute
+
+            const startHourSelect = document.querySelector(`select[name="${program}_start_hour"]`);
+            const startMinuteSelect = document.querySelector(`select[name="${program}_start_minute"]`);
+
+            // Update start hour options
+            updateSelectOptions(startHourSelect, 1, 24, data[`${program}_start_hour`][0]);
+
+            // Update start minute options
+            updateSelectOptions(startMinuteSelect, 0, 59, data[`${program}_start_minute`][0]);
+ 
+        }
+        });
+
+
         // Filter the days that are active ("on")
         const activeDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
         .filter(day => data[day] && data[day][0] === "on");
@@ -175,7 +193,24 @@
         console.error('There was a problem with the fetch operation:', error);
     });
 
+    // Function to update select options with start and end values and set default selected value
+    function updateSelectOptions(selectElement, startValue, endValue, defaultValue) {
+        selectElement.innerHTML = ''; // Clear existing options
+
+        for (let i = startValue; i <= endValue; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i.toString().padStart(2, '0'); // Add leading zero if needed
+            if (i === parseInt(defaultValue, 10)) {
+            option.selected = true; // Set default selected value
+            }
+            selectElement.appendChild(option);
+        }
+    }
+
+
     </script>
+    
 
 
 </body>
