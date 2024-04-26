@@ -17,8 +17,18 @@ def init():
     global riego_cancelado
     global seteo_programas
 
-    riego_automatico = read_json_config("riego_automatico.json")
-    riego_cancelado = read_json_config("riego_cancelado.json")
-    seteo_programas = read_json_config("seteo_programas.json")
+    try:
+        riego_automatico = read_json_config("riego_automatico.json")
+    except:
+        riego_automatico = {}
+    try:
+        riego_cancelado = read_json_config("riego_cancelado.json")
+    except:
+        riego_cancelado = {}
+    try:
+        seteo_programas = read_json_config("seteo_programas.json")
+    except:
+        seteo_programas = {}
+
 
 

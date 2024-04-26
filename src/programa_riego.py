@@ -174,7 +174,10 @@ class Programa:
         init_pins(Rele_pins)
 
         # check if its suspended.
-        cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
+        try:
+            cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
+        except:
+            cancelado_hasta_str = ""
         if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
             self.st = "wait"
             self.prev_st = "off"
