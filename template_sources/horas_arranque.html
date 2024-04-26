@@ -133,22 +133,43 @@
         // Filter the days that are active ("on")
         const activeDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
         .filter(day => data[day] && data[day][0] === "on");
+        const activeProgramas = ['programa_1','programa_2', 'programa_3']
+        .filter(programa => data[programa] && data[programa][0] === "on");
         console.log('Active days:')
         console.log(activeDays)
+        console.log('Active programas:')
+        console.log(activeProgramas)
 
         // Update the HTML to show only active days
-        const checkboxes = document.querySelectorAll('#calendario input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-        const dayName = checkbox.name;
+        const checkboxes_days = document.querySelectorAll('#calendario input[type="checkbox"]');
+        checkboxes_days.forEach(checkbox_day => {
+        const dayName = checkbox_day.name;
         console.log('checkbox name day: ' + dayName)
         if (!activeDays.includes(dayName)) {
-            checkbox.checked = false; // Uncheck inactive days
+            checkbox_day.checked = false; // Uncheck inactive days
         }
         else
         {
-            checkbox.checked = true;
+            checkbox_day.checked = true;
         }
         });
+
+        // Update the HTML to show only active programas
+        const checkboxes_programas = document.querySelectorAll('#horas_arranque input[type="checkbox"]');
+        checkboxes_programas.forEach(checkbox_programa => {
+        const programaName = checkbox_programa.name;
+        console.log('checkbox name programa: ' + programaName)
+        if (!activeProgramas.includes(programaName)) {
+            checkbox_programa.checked = false; // Uncheck inactive days
+        }
+        else
+        {
+            checkbox_programa.checked = true;
+        }
+        });
+
+
+
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
