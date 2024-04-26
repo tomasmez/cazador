@@ -25,9 +25,10 @@ boot.mpy: $(SRC_DIR)/boot.py $(SRC_DIR)/bota.py
 	cp "$(SRC_DIR)/boot.py" "$(BUILD_DIR)/boot.py"
 	$(MPY) "$(SRC_DIR)/bota.py" -o "$(BUILD_DIR)/bota.mpy"
 
-main.mpy: $(SRC_DIR)/main.py $(SRC_DIR)/principal.py
+main.mpy: $(SRC_DIR)/main.py $(SRC_DIR)/principal.py $(SRC_DIR)/globales.py
 	cp "$(SRC_DIR)/main.py" "$(BUILD_DIR)/main.py"
 	$(MPY) "$(SRC_DIR)/principal.py" -o "$(BUILD_DIR)/principal.mpy"
+	$(MPY) "$(SRC_DIR)/globales.py" -o "$(BUILD_DIR)/globales.mpy"
 
 programa_riego.mpy: $(SRC_DIR)/programa_riego.py
 	$(MPY) "$(SRC_DIR)/programa_riego.py" -o "$(BUILD_DIR)/programa_riego.mpy"

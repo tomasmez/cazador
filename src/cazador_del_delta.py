@@ -5,6 +5,8 @@ from machine import I2C, Pin
 from time import gmtime, time
 import os
 
+import globales
+
 def render_template(filename, values_dict={}):
     try:
         with open(filename, 'r') as file:
@@ -103,19 +105,19 @@ def set_local_time(datetime_str):
     
 
         
-def read_json_config(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            json_data = ujson.load(file)
-            return json_data
-    except OSError:
-        return {}  
-    file.close()
+#def read_json_config(file_path):
+#
+#    try:
+#        with open(file_path, 'r') as file:
+#            json_data_local = ujson.load(file)
+#            return json_data_local
+#    except Exception as e:
+#        print('Error',e)
+#        return {}    
         
-def read_json_config_programas(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            json_data = ujson.load(file)
+def read_json_config_programas(json_data):
+    if json_data == {}:
+        return {}
             # Filter out zones that are not 'on' and include minutes for the ones that are on
             # Filter out zones that are not 'on' and include minutes for the ones that are on
             # filtered_data = {}
@@ -126,11 +128,8 @@ def read_json_config_programas(file_path):
             #         filtered_data[minute_key] = json_data[minute_key]
             # Order by key
             # ordered_data = dict(sorted(filtered_data.items()))
-            ordered_data = dict(sorted(json_data.items()))
-            file.close()
-            return ordered_data
-    except OSError:
-        return {}
+    ordered_data = dict(sorted(json_data.items()))
+    return ordered_data
         
 
 def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
@@ -159,62 +158,52 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
     
     return transformed_data
 
-def read_json_config_programa_manual(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            data = ujson.load(file)
-            programs = [key for key in data.keys() if key.startswith("programa_") and data[key] == ["on"]]
-            filtered_programs = {}
-            for program in programs:
-                program_number = program.split("_")[1]
-                start_hour = data.get(f"programa_{program_number}_start_hour", [""])[0]
-                start_minute = data.get(f"programa_{program_number}_start_minute", [""])[0]
-                filtered_programs[f"programa_{program_number}"] = {"hora": start_hour, "minuto": start_minute}
-            file.close()
-            return filtered_programs
-    except Exception as e:
-        print('Error',e)
+def read_json_config_programa_manual(data):
+    if data == {}:
         return {}
+    programs = [key for key in data.keys() if key.startswith("programa_") and data[key] == ["on"]]
+    filtered_programs = {}
+    for program in programs:
+        program_number = program.split("_")[1]
+        start_hour = data.get(f"programa_{program_number}_start_hour", [""])[0]
+        start_minute = data.get(f"programa_{program_number}_start_minute", [""])[0]
+        filtered_programs[f"programa_{program_number}"] = {"hora": start_hour, "minuto": start_minute}
+    return filtered_programs
 
-def read_calendario(file_path):
-    try:
-        calendario = {}
-        dias_habilitados = []
-        with open(file_path, 'r') as file:
-            data = ujson.load(file)
-            print('calendario_data',data)
-            print('---end---')
-            try:
-                # Extract the days of the week that are 'on' and add them to dias_habilidatos
-                dias_habilitados = [key for key in data.keys() if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"] and data[key] == ["on"]]
-                calendario["dias_habilitados"] = dias_habilitados
-            except Exception as ex:
-                print(f'Error leyendo calendario {file_path}:{ex}')        
-     
-            file.close()
-        return calendario
-    except Exception as e:
-        print('Error',e)
-        return {}    
-
-
-def read_json_config_programa_automatico(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            data = ujson.load(file)
-            riego_automatico = data.get("riego_automatico", [""])[0]
-            filtered_programs = {}
-            if riego_automatico == "habilitado":
-                salida_del_sol = data.get("salida_del_sol", [""])[0]
-                puesta_del_sol = data.get("puesta_del_sol", [""])[0]
-                filtered_programs["automatico"] = {"salida_del_sol": salida_del_sol}, {"puesta_del_sol": puesta_del_sol}
-                file.close()
-                return filtered_programs
-            else:
-                file.close()
-                return {}
-    except Exception as e:
+def read_calendario(data):
+    if data == {}:
         return {}
+    calendario = {}
+    dias_habilitados = []
+    print('calendario_data',data)
+    print('---end---')
+    try:
+        # Extract the days of the week that are 'on' and add them to dias_habilidatos
+        dias_habilitados = [key for key in data.keys() if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"] and data[key] == ["on"]]
+        calendario["dias_habilitados"] = dias_habilitados
+    except Exception as ex:
+        print(f'Error leyendo calendario {file_path}:{ex}')        
+ 
+    return calendario
+
+###TODO esta funcion no se usa mas. eliminar?
+#def read_json_config_programa_automatico(file_path):
+#    try:
+#        with open(file_path, 'r') as file:
+#            data = ujson.load(file)
+#            riego_automatico = data.get("riego_automatico", [""])[0]
+#            filtered_programs = {}
+#            if riego_automatico == "habilitado":
+#                salida_del_sol = data.get("salida_del_sol", [""])[0]
+#                puesta_del_sol = data.get("puesta_del_sol", [""])[0]
+#                filtered_programs["automatico"] = {"salida_del_sol": salida_del_sol}, {"puesta_del_sol": puesta_del_sol}
+#                file.close()
+#                return filtered_programs
+#            else:
+#                file.close()
+#                return {}
+#    except Exception as e:
+#        return {}
 
 
 
@@ -229,6 +218,8 @@ def write_json_config(file_path, json_data):
         print("Error writing to file:", e)
         return
     file.close()
+    # now we update the variable in ram
+    var_name = file_path.split(".")[0]
         
 
 def dict_to_html_table(input_dict):
