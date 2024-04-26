@@ -116,6 +116,46 @@
     
 </script>
 
+<script>
+
+    // Define the URL of the Flask endpoint
+    const endpointUrl = '/return_json_file?file=riego_automatico.json';
+
+    // Make a GET request to the Flask endpoint
+    fetch(endpointUrl)
+    .then(response => {
+        if (!response.ok) {
+        throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Filter the days that are active ("on")
+        const activeDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
+        .filter(day => data[day] && data[day][0] === "on");
+        console.log('Active days:')
+        console.log(activeDays)
+
+        // Update the HTML to show only active days
+        const checkboxes = document.querySelectorAll('#calendario input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+        const dayName = checkbox.name;
+        console.log('checkbox name day: ' + dayName)
+        if (!activeDays.includes(dayName)) {
+            checkbox.checked = false; // Uncheck inactive days
+        }
+        else
+        {
+            checkbox.checked = true;
+        }
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+
+    </script>
+
 
 </body>
 </html>

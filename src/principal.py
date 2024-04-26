@@ -1,6 +1,6 @@
 import sys
 import gc
-
+import os
 gc.enable()
 
 
@@ -193,6 +193,23 @@ async def prueba_zonas(request):
         return redirect('/prueba_zonas')
     else:
         return send_file(template) 
+
+
+@app.route('/return_json_file')
+def return_json_file(request):
+    # used to retrive existing config from js
+    # Get the file name from the query parameter
+    file_name = request.args.get('file')
+
+    # Check if the file name is provided
+    if not file_name:
+        return ujson.load({'error': 'File name not provided'})
+
+    # Read the JSON file using ujson
+    json_data = read_json_config(file_name)
+
+    # Return the JSON data
+    return json_data
 
 
 print('Server started')

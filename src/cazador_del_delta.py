@@ -3,6 +3,7 @@ import ujson
 from ds1307 import DS1307
 from machine import I2C, Pin
 from time import gmtime, time
+import os
 
 def render_template(filename, values_dict={}):
     try:
@@ -214,6 +215,8 @@ def read_json_config_programa_automatico(file_path):
                 return {}
     except Exception as e:
         return {}
+
+
 
 
         
