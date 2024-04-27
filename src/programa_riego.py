@@ -87,7 +87,10 @@ def rtc_current_time():
     ds1307 = DS1307(addr=I2C_ADDR, i2c=i2c)
 
     # Get the current RTC time as a tuple (year, month, day, hour, minute, second, weekday, yearday)
-    ret_val =  { "time" : [ds1307.hour, ds1307.minute, ds1307.second], "date" : [ds1307.year, ds1307.month, ds1307.day] }
+    try:
+        ret_val =  { "time" : [ds1307.hour, ds1307.minute, ds1307.second], "date" : [ds1307.year, ds1307.month, ds1307.day] }
+    except:
+        ret_val =  { "time" : [0, 0, 0], "date" : [2000, 1, 1] }
 
     return ret_val
 

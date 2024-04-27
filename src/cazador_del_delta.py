@@ -29,7 +29,11 @@ def get_current_time(days_to_add=0):
     ds1307 = DS1307(addr=I2C_ADDR, i2c=i2c)
     
     # Get the current RTC time as a tuple (year, month, day, hour, minute, second, weekday, yearday)
-    current_time = ds1307.datetime
+    try:
+        current_time = ds1307.datetime
+    except:
+        print("Failed to get current time")
+        current_time = [ 2000, 1, 1, 0, 0, 0, 0, 1]
     
     print(current_time)
     # Add delta_days to the current date
