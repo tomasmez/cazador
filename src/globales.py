@@ -32,3 +32,7 @@ def init():
 
 
 
+def print_g(g_var = None):
+    if not g_var:
+        return globals()
+    return globals()[g_var]

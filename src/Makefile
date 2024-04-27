@@ -59,6 +59,8 @@ microdot: mdot_microdot.mpy mdot___init__.mpy
 
 cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy
 
+install_c: clean cazador
+	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
 install: cazador templates
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 

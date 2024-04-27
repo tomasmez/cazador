@@ -405,7 +405,9 @@ class Programa:
             pass
         self.seconds += 1
         gc.collect()
-        #print(f"program runnning: {self.program_running()}, Free ram: {gc.mem_free()}")
+        free_mem = gc.mem_free()
+        if free_mem < 50000:
+            print(f"program runnning: {self.program_running()}, Free ram: {free_mem}")
         
         pulse.value(0)
 

@@ -151,7 +151,7 @@ async def horas_arranque(request):
         
 @app.route('/horas_arranque_json', methods=['GET'])
 async def horas_arranque_json(request):
-    riego_automatico_json = read_json_config_programa_manual(riego_automatico)
+    riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
     return riego_automatico_json
     
 @app.route('/seteo_riego_manual', methods=['GET', 'POST'])
@@ -214,8 +214,19 @@ def return_json_file(request):
     if not file_name:
         return ujson.load({'error': 'File name not provided'})
 
+    print(f"globals at globales = {globales.print_g()}")
+
+    try:
+        #print(f"printing: {file_name.split(".")[0]} at globales.")
+        #print(f"{file_name.split(".")[0]} = {globales.print_g(file_name.split(".")[0])}")
+        json_data = ujson.dumps(globales.print_g(file_name.split(".")[0]))
+        #print(json_data)
+        #print(read_json_config(file_name))
+    except:
+        print(f"WARN: globales global var {file_name} not found\n    Using file on disk instead")
     # Read the JSON file using ujson
-    json_data = read_json_config(file_name)
+        json_data = read_json_config(file_name)
+    #json_data = read_json_config(file_name)
 
     # Return the JSON data
     return json_data
