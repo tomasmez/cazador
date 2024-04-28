@@ -78,7 +78,7 @@ def rtc_weekday(now):
     return 1
 
 def rtc_current_time():
-    from machine import I2C, Pin
+    from machine import I2C, Pin, RTC
     from ds1307 import DS1307
 
                 # Get the current time in seconds since the epoch
@@ -90,7 +90,10 @@ def rtc_current_time():
     try:
         ret_val =  { "time" : [ds1307.hour, ds1307.minute, ds1307.second], "date" : [ds1307.year, ds1307.month, ds1307.day] }
     except:
-        ret_val =  { "time" : [0, 0, 0], "date" : [2000, 1, 1] }
+        rtc = RTC()
+        date_time = rtc.datetime()
+        ret_val =  { "time" : [date_time[4], date_time[5], date_time[6]], "date" : [date_time[0], date_time[1], date_time[2]] }
+        #print(f"rtc_current_time: {ret_val} {date_time}")
 
     return ret_val
 

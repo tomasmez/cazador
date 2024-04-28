@@ -14,6 +14,11 @@ from cazador_del_delta import render_template,get_current_time,json_to_html_tabl
 from cazador_del_delta import read_calendario
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
 from programa_riego import Programa, toggle_port
+from machine import RTC
+
+rtc = RTC()
+
+print(f"RTC time: {rtc.datetime()}")
 
 
 sys.path.append('microdot')

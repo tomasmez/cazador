@@ -1,7 +1,7 @@
 import utime
 import ujson
 from ds1307 import DS1307
-from machine import I2C, Pin
+from machine import I2C, Pin, RTC
 from time import gmtime, time
 import os
 
@@ -31,24 +31,34 @@ def get_current_time(days_to_add=0):
     # Get the current RTC time as a tuple (year, month, day, hour, minute, second, weekday, yearday)
     try:
         current_time = ds1307.datetime
+        new_time = (
+            current_time[0],  # year
+            current_time[1],  # month
+            current_time[2] ,  # day
+            current_time[3],  # hour
+            current_time[4],  # minute
+            current_time[5],  # second
+            current_time[6],  # weekday
+            current_time[7]   # yearday
+        )
     except:
-        print("Failed to get current time")
-        current_time = [ 2000, 1, 1, 0, 0, 0, 0, 1]
+        rtc = RTC()
+        current_time = rtc.datetime()
+        new_time = (
+            current_time[0],  # year
+            current_time[1],  # month
+            current_time[2] ,  # day
+            current_time[4],  # hour
+            current_time[5],  # minute
+            current_time[6],  # second
+            current_time[3],  # weekday
+            current_time[7]   # microsecond
+        )
     
     print(current_time)
     # Add delta_days to the current date
-    new_time = (
-        current_time[0],  # year
-        current_time[1],  # month
-        current_time[2] ,  # day
-        current_time[3],  # hour
-        current_time[4],  # minute
-        current_time[5],  # second
-        current_time[6],  # weekday
-        current_time[7]   # yearday
-    )
     
-    current_timestamp = utime.mktime(current_time)
+    current_timestamp = utime.mktime(new_time)
     
     # Calculate the new timestamp after adding days
     new_timestamp = current_timestamp + (days_to_add * 24 * 60 * 60)
@@ -102,10 +112,15 @@ def set_local_time(datetime_str):
     i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=800000)
     ds1307 = DS1307(addr=I2C_ADDR, i2c=i2c)
     
+    try:
     # set the RTC time to the current system time
-    ds1307.datetime = timestamp
+        ds1307.datetime = timestamp
+        print("Current RTC time: {}".format(ds1307.datetime))
+    except:
+        rtc=RTC()
+        rtc.datetime((year, month, day, 0, hour, minute, 0, 0))
     # get the current RTC time
-    print("Current RTC time: {}".format(ds1307.datetime))
+        print("Current RTC time: {}".format(rtc.datetime()))
     
 
         
