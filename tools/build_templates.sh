@@ -18,6 +18,7 @@ TEMPLATES=("index.html"
 	"config.html"
 	"horas_arranque.html"
 	"tiempos_riego.html"
+	"registration.html"
 	)	
 
 HEADER="$SOURCE_DIR/header.html"

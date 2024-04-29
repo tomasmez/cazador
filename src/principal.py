@@ -11,10 +11,11 @@ gc.enable()
 
 from microdot import Microdot, Response, send_file,redirect
 from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_manual,transform_seteo_programas_json
-from cazador_del_delta import read_calendario
+from cazador_del_delta import read_calendario,check_wifi
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
 from programa_riego import Programa, toggle_port
 from machine import RTC
+import urequests
 
 rtc = RTC()
 
@@ -33,10 +34,12 @@ p1.run(1000)
 
 @app.route('/', methods=['GET', 'POST'])
 async def index(request):
+    # main route , redirected if json are missing
     template = 'templates/index.html'
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
     riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
+    
     print('---riego_automatico_json---')
     print(riego_automatico_json)
     print('----')
@@ -53,6 +56,7 @@ async def index(request):
     print('---seteo_programas_transformed---')
     print(calendario_json)
     print('----')      
+
     try:
         seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
     except:
@@ -235,6 +239,45 @@ def return_json_file(request):
 
     # Return the JSON data
     return json_data
+
+
+# Route to handle registration
+@app.route('/registration', methods=['GET', 'POST'])
+def register(request):
+    print('Registration endpoint')
+    template = 'templates/registration.html'
+    my_dict = {}
+    if request.method == 'POST':
+        device_name = request.form['device_name']
+        wifi_connected, ip = check_wifi()
+        print('POST received and wifi is :',wifi_connected,ip)
+        if wifi_connected:
+            url = f"http://chat2023.pythonanywhere.com/register?device_name={device_name}&device_ip={ip}&device_id=test"
+            print(url)
+            response = urequests.get(url)
+            if response.status_code == 200:
+                # Save device name to registered.json
+                with open('registered.json', 'w') as f:
+                    ujson.dump({'device_name': device_name}, f)
+                my_dict["device_name"] = device_name
+                return render_template(template,my_dict)
+            else:
+                my_dict["device_name"] = 'FAILED_TO_REGISTER'
+                return render_template(template,my_dict)
+        else:
+                my_dict["device_name"] = 'WIFI_NOT_CONNECTED'
+                return render_template(template,my_dict)
+    elif request.method == 'GET':
+        try:
+            print('Attempting to read registered.json')
+            with open('registered.json', 'r') as f:
+                data = ujson.load(f)
+                device_name = data['device_name']
+                my_dict["device_name"] = device_name
+            return render_template(template,my_dict)
+        except Exception as ex:
+            my_dict["device_name"] = 'NO_DEVICE_REGISTERED'
+            return render_template(template,my_dict)
 
 
 print('Server started')

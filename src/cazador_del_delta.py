@@ -4,6 +4,7 @@ from ds1307 import DS1307
 from machine import I2C, Pin, RTC
 from time import gmtime, time
 import os
+import network
 
 import globales
 
@@ -96,7 +97,17 @@ def get_current_time_old():
     
     return time_string
    
-   
+
+# Function to check if WiFi is connected and get the current IP address
+def check_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    if wlan.isconnected():
+        ip = wlan.ifconfig()[0]
+        return True, ip
+    else:
+        return False, None
+
+
 def set_local_time(datetime_str):
     # Split the datetime string into date and time parts
     date, time = datetime_str.split('T')
