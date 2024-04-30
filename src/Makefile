@@ -62,6 +62,9 @@ cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazad
 install_c: clean cazador
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
+install_t: clean templates
+	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
+
 install: cazador templates
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
