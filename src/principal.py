@@ -34,6 +34,40 @@ p1.run(1000)
 
 @app.route('/', methods=['GET', 'POST'])
 async def index(request):
+    if request.method == 'POST':
+        hora_actual_str = get_current_time()
+        try:
+            suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
+            if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
+                print('RIEGO SUSPENDIDO hasta:',suspendido_hasta_str)
+                #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
+                #request.form["dias_suspendidos"] = dias_suspendidos
+                p1.state("suspend")
+            elif p1.state() == "suspend":
+                p1.state("wait")
+            request.form["suspendido_hasta"] = suspendido_hasta_str
+            p1.state("pause")
+            config = 'riego_suspendido.json'
+            write_json_config(config,request.form)
+            globales.riego_suspendido = read_json_config(config)
+            p1.state("unpause")
+            return redirect('/')
+        except:
+            print("hubo una excepcion dentro de dias suspendidos")
+            pass
+        try:
+            programa_manual = request.form["programa_manual"]
+                
+            print(f"Corriendo programa manual: {programa_manual}")    
+            p1.run_program(programa_manual)
+        except:
+            pass
+        try:
+            riego_cancelado = request.form["cancelar"]
+            print(f"Cancelando programa actual: {riego_cancelado}")    
+            p1.state("cancelled")
+        except:
+            pass
     # main route , redirected if json are missing
     if p1.state() == "run" or p1.state() == "manual_run":
         template = 'templates/index_running.html'
@@ -76,46 +110,12 @@ async def index(request):
             my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
     except:
         my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
-    config = 'riego_suspendido.json'
     try:
         my_dict["running_program_nr"] = p1.run_program()[0]
         my_dict["running_program_min"] = int(p1.run_program()[1]/60)
     except:
         pass
-    if request.method == 'POST':
-        hora_actual_str = get_current_time()
-        try:
-            suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
-            if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
-                print('RIEGO SUSPENDIDO hasta:',suspendido_hasta_str)
-                #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
-                #request.form["dias_suspendidos"] = dias_suspendidos
-                p1.state("suspend")
-            elif p1.state() == "suspend":
-                p1.state("wait")
-            request.form["suspendido_hasta"] = suspendido_hasta_str
-            p1.state("pause")
-            write_json_config(config,request.form)
-            globales.riego_suspendido = read_json_config(config)
-            p1.state("unpause")
-            return redirect('/')
-        except:
-            pass
-        try:
-            programa_manual = request.form["programa_manual"]
-                
-            print(f"Corriendo programa manual: {programa_manual}")    
-            p1.run_program(programa_manual)
-        except:
-            pass
-        try:
-            riego_cancelado = request.form["cancelar"]
-            print(f"Cancelando programa actual: {riego_cancelado}")    
-            p1.state("cancelled")
-        except:
-            pass
-    else:
-        return render_template(template,my_dict)
+    return render_template(template,my_dict)
     
 """    
 @app.route('/cancelar_riego', methods=['GET', 'POST'])
