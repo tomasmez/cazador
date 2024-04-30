@@ -57,7 +57,7 @@ def get_current_time(days_to_add=0):
             current_time[7]   # microsecond
         )
     
-    print(current_time)
+    #print(current_time)
     # Add delta_days to the current date
     
     current_timestamp = utime.mktime(new_time) + globales.timezone * 60 * 60

@@ -369,8 +369,8 @@ class Programa:
             suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
             if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
                 self.state("wait")
-            else:
-                print(f"Riego suspendido hasta: {suspendido_hasta_str}")
+#            else:
+#                print(f"Riego suspendido hasta: {suspendido_hasta_str}")
 
     # returns status of running program.
     # tuple [ "programa", minutes remaining, zone number ]
