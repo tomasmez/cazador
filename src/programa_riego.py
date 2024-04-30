@@ -181,10 +181,10 @@ class Programa:
 
         # check if its suspended.
         try:
-            cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
+            suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
         except:
-            cancelado_hasta_str = ""
-        if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
+            suspendido_hasta_str = ""
+        if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
             self.st = "wait"
             self.prev_st = "off"
         else:
@@ -368,11 +368,11 @@ class Programa:
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
         if self.state() == "suspend":
-            cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
-            if cancelado_hasta_str <= get_current_time(): # el riego NO esta cancelado
+            suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
+            if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
                 self.state("wait")
             else:
-                print(f"Riego suspendido hasta: {cancelado_hasta_str}")
+                print(f"Riego suspendido hasta: {suspendido_hasta_str}")
 
     # returns status of running program.
     # tuple [ "programa", minutes remaining, zone number ]

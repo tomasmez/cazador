@@ -14,7 +14,7 @@ def read_json_config(file_path):
 
 def init():
     global riego_automatico
-    global riego_cancelado
+    global riego_suspendido
     global seteo_programas
 
     try:
@@ -22,9 +22,9 @@ def init():
     except:
         riego_automatico = {}
     try:
-        riego_cancelado = read_json_config("riego_cancelado.json")
+        riego_suspendido = read_json_config("riego_suspendido.json")
     except:
-        riego_cancelado = {}
+        riego_suspendido = {}
     try:
         seteo_programas = read_json_config("seteo_programas.json")
     except:

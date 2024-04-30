@@ -14,7 +14,9 @@ TEMPLATES_DIR="$BUILD_DIR/templates"
 SOURCE_DIR="../template_sources"
 
 
-TEMPLATES=("index.html"
+TEMPLATES=(
+	"index_not_running.html"
+	"index_running.html"
 	"config.html"
 	"horas_arranque.html"
 	"tiempos_riego.html"

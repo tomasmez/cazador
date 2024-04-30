@@ -35,7 +35,11 @@ p1.run(1000)
 @app.route('/', methods=['GET', 'POST'])
 async def index(request):
     # main route , redirected if json are missing
-    template = 'templates/index.html'
+    if p1.state() == "run" or p1.state() == "manual_run":
+        template = 'templates/index_running.html'
+    else:
+        template = 'templates/index_not_running.html'
+
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
     riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
@@ -63,34 +67,49 @@ async def index(request):
         pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
-    print(globales.riego_cancelado,type(globales.riego_cancelado))
+    print(globales.riego_suspendido,type(globales.riego_suspendido))
     try:
-        cancelado_hasta_str = globales.riego_cancelado["cancelado_hasta"][0]
-        if cancelado_hasta_str > get_current_time(): # el riego NO esta cancelado
-            print('CONFIRMADO Riego cancelado hasta',cancelado_hasta_str)
-            my_dict["riego_cancelado"] = f"<mark>{cancelado_hasta_str}</mark>"
+        suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
+        if suspendido_hasta_str > get_current_time(): # el riego NO esta suspendido
+            print('CONFIRMADO Riego suspendido hasta',suspendido_hasta_str)
+            my_dict["riego_suspendido"] = f"<mark>{suspendido_hasta_str}</mark>"
         else:
-            my_dict["riego_cancelado"] = 'RIEGO ACTIVO'
+            my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
     except:
-        my_dict["riego_cancelado"] = 'RIEGO ACTIVO'
-    config = 'riego_cancelado.json'
+        my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
+    config = 'riego_suspendido.json'
     if request.method == 'POST':
         hora_actual_str = get_current_time()
-        cancelado_hasta_str = get_current_time(int(request.form["dias_cancelados"]))
-        if cancelado_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
-            print('RIEGO CANCELADO hasta:',cancelado_hasta_str)
-            #dias_cancelados = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_cancelados"]} dias</p>'
-            #request.form["dias_cancelados"] = dias_cancelados
-            p1.state("suspend")
-        elif p1.state() == "suspend":
-            p1.state("wait")
-
-        request.form["cancelado_hasta"] = cancelado_hasta_str
-        p1.state("pause")
-        write_json_config(config,request.form)
-        globales.riego_cancelado = read_json_config(config)
-        p1.state("unpause")
-        return redirect('/')
+        try:
+            suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
+            if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
+                print('RIEGO SUSPENDIDO hasta:',suspendido_hasta_str)
+                #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
+                #request.form["dias_suspendidos"] = dias_suspendidos
+                p1.state("suspend")
+            elif p1.state() == "suspend":
+                p1.state("wait")
+            request.form["suspendido_hasta"] = suspendido_hasta_str
+            p1.state("pause")
+            write_json_config(config,request.form)
+            globales.riego_suspendido = read_json_config(config)
+            p1.state("unpause")
+            return redirect('/')
+        except:
+            pass
+        try:
+            programa_manual = request.form["programa_manual"]
+                
+            print(f"Corriendo programa manual: {programa_manual}")    
+            p1.run_program(programa_manual)
+        except:
+            pass
+        try:
+            riego_cancelado = request.form["cancelar"]
+            print(f"Cancelando programa actual: {riego_cancelado}")    
+            p1.state("cancelled")
+        except:
+            pass
     else:
         return render_template(template,my_dict)
     
@@ -98,15 +117,15 @@ async def index(request):
 @app.route('/cancelar_riego', methods=['GET', 'POST'])
 async def cancelar_riego(request):
     template = 'templates/cancelar_riego.html'
-    config = 'riego_cancelado.json'
+    config = 'riego_suspendido.json'
     if request.method == 'POST':
         hora_actual_str = get_current_time()
-        cancelado_hasta_str = get_current_time(int(request.form["dias_cancelados"]))
-        if cancelado_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
-            print('RIEGO CANCELADO hasta:',cancelado_hasta_str)
-            #dias_cancelados = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_cancelados"]} dias</p>'
-            #request.form["dias_cancelados"] = dias_cancelados
-        request.form["cancelado_hasta"] = cancelado_hasta_str
+        suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
+        if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
+            print('RIEGO CANCELADO hasta:',suspendido_hasta_str)
+            #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
+            #request.form["dias_suspendidos"] = dias_suspendidos
+        request.form["suspendido_hasta"] = suspendido_hasta_str
         p1.state("pause")
         write_json_config(config,request.form)
         p1.state("unpause")
@@ -118,11 +137,11 @@ async def cancelar_riego(request):
 @app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
     template = 'templates/config.html'
-    if p1.state() == "run":
-        print("tratando de cancelar")
-        p1.state("cancelled")
-    else:
-        p1.run_program("program_1")
+    #if p1.state() == "run":
+    #    print("tratando de cancelar")
+    #    p1.state("cancelled")
+    #else:
+    #    p1.run_program("program_1")
 
     if request.method == 'POST':
         post_time_str = request.form["datetime"]
