@@ -3,7 +3,7 @@ import network
 import usocket as socket
 import utime
 import urequests
-from machine import Pin
+from machine import Pin, RTC
 from globales import read_json_config
 # Create Access Point
 ap_ssid = "ESP32_AP"
@@ -44,5 +44,22 @@ else:
     #utime.sleep(1)
     print(f'Access point started: SSID = {ap_ssid}, password = {ap_password}')
     print('network config:', ap.ifconfig())
+
+
+import ntptime
+rtc = RTC()
+
+rtc_ram = rtc.memory()
+if rtc_ram == b'':
+    rtc.init((2000, 1, 1, 0, 0, 0, 0, 0))
+    try:
+        ntptime.settime()
+        now=rtc.datetime()
+        now=f"{now[0]}_{now[1]}_{now[2]}_{now[3]}_{now[4]}_{now[5]}_{now[6]}"
+        rtc.memory(now)
+    except:
+        print("Failed to sync date/time")
+rtc_ram = rtc.memory()
+print(f"first byte of RTC ram is: {rtc_ram}")
 
 #import uftpd

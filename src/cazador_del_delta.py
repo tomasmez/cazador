@@ -42,6 +42,7 @@ def get_current_time(days_to_add=0):
             current_time[6],  # weekday
             current_time[7]   # yearday
         )
+
     except:
         rtc = RTC()
         current_time = rtc.datetime()
@@ -59,7 +60,7 @@ def get_current_time(days_to_add=0):
     print(current_time)
     # Add delta_days to the current date
     
-    current_timestamp = utime.mktime(new_time)
+    current_timestamp = utime.mktime(new_time) + globales.timezone * 60 * 60
     
     # Calculate the new timestamp after adding days
     new_timestamp = current_timestamp + (days_to_add * 24 * 60 * 60)

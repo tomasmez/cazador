@@ -1,3 +1,4 @@
+from machine import RTC
 import sys
 import gc
 import os
@@ -140,6 +141,9 @@ async def cancelar_riego(request):
     
 @app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
+    rtc = RTC()
+    rtc.memory('')
+
     template = 'templates/config.html'
     #if p1.state() == "run":
     #    print("tratando de cancelar")

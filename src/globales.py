@@ -16,6 +16,9 @@ def init():
     global riego_automatico
     global riego_suspendido
     global seteo_programas
+    global timezone
+
+    timezone = -3
 
     try:
         riego_automatico = read_json_config("riego_automatico.json")
