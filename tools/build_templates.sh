@@ -31,7 +31,14 @@ for file in ${TEMPLATES[@]}; do
 	cat "${HEADER%.*}.style" > "$TEMPLATES_DIR/$file"
 	cat "$SOURCE_DIR/${file%.*}.style" >> "$TEMPLATES_DIR/$file"
 	cat "$HEADER" >> "$TEMPLATES_DIR/$file"
-	STRING="###ACTIVE${file}###"
+
+	# special case for all files that start with index_
+	if [ "${file%%_*}" == "index" ]; then
+		STRING="###ACTIVEindex.html###"
+	else
+		STRING="###ACTIVE${file}###"
+	fi
+
 	sed -i "s/$STRING/class=\"active\"/g" "$TEMPLATES_DIR/$file"
 	sed -i "s/###ACTIVE.*###//g"  "$TEMPLATES_DIR/$file"
 
