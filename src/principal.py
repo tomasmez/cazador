@@ -43,7 +43,6 @@ async def index(request):
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
     riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
-    
     print('---riego_automatico_json---')
     print(riego_automatico_json)
     print('----')
@@ -78,6 +77,11 @@ async def index(request):
     except:
         my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
     config = 'riego_suspendido.json'
+    try:
+        my_dict["running_program_nr"] = p1.run_program()[0]
+        my_dict["running_program_min"] = int(p1.run_program()[1]/60)
+    except:
+        pass
     if request.method == 'POST':
         hora_actual_str = get_current_time()
         try:

@@ -176,6 +176,7 @@ class Programa:
         self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
         self.tim=Timer(0)
         self.temp = 0.0 #temperatura del ds18b20
+        self.actual_program = ""
 
         init_pins(Rele_pins)
 
@@ -277,15 +278,19 @@ class Programa:
             return self.st
         return self.st
 
-    def run_program(self, program_name):
+    def run_program(self, program_name = None):
         
-        if self.state() == "run":
+        if self.state() == "run" or self.state() == "manual_run":
             print("WARN: run_program cannot execute if running already. cancel program first.")
-            return
+            return [self.actual_program, sum(self.delay_secs)]
+
+        elif not program_name:
+            return None
 
         # need to check if program_name exists.
         delay_mins = read_minutes(program_name)
         self.delay_secs = [x * 60 for x in delay_mins]
+        self.actual_program = program_name
 
         #special case, run a program that has 0 minutes to run.
         # need to skip this run.
@@ -334,6 +339,7 @@ class Programa:
                             # need to skip this run.
                             if sum(self.delay_secs) != 0:
                                 print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
+                                self.actual_program = program
                                 print(self.delay_secs)
 
                                 toggle_port(self.rele_pins[0])

@@ -58,8 +58,8 @@
             border: 0;
             border-top: 1px solid #ccc;
         }
-        input[type="submit"] {
-            background-color: #4CAF50;
+        input[id="cancelar"] {
+            background-color: #FF0000;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -67,6 +67,6 @@
             cursor: pointer;
             font-size: 16px;
         }
-        input[type="submit"]:hover {
-            background-color: #45a049;
+        input[id="cancelar"]:hover {
+            background-color: #DD2222;
         }
