@@ -117,6 +117,7 @@ def set_local_time(datetime_str):
     
     # Convert the datetime components into a UNIX timestamp
     timestamp = (year, month, day, hour, minute, 1, 0, 0)
+    timestamp += globales.timezone * 3600
     print('Setting local time to',(year, month, day, hour, minute, 1, 0, 0))
     # Set the local time
     # DS1307 on 0x68
