@@ -337,8 +337,8 @@ class Programa:
                                 toggle_port(self.rele_pins[0])
                                 self.state("run")
 
-            else:
-                print("No es un dia de riego habilitado!!")
+            #else:
+            #    print("No es un dia de riego habilitado!!")
 
 
         if(self.state() == "cancelled"):
