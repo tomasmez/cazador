@@ -18,6 +18,10 @@ from programa_riego import Programa, toggle_port
 from machine import RTC
 import urequests
 
+def ceiling(x):
+    n = int(x)
+    return n if n-1 < x <= n else n+1
+
 rtc = RTC()
 
 print(f"RTC time: {rtc.datetime()}")
@@ -113,7 +117,7 @@ async def index(request):
         my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
     try:
         my_dict["running_program_nr"] = p1.run_program()[0]
-        my_dict["running_program_min"] = int(p1.run_program()[1]/60)
+        my_dict["running_program_min"] = ceiling(p1.run_program()[1]/60)
     except:
         pass
     return render_template(template,my_dict)
