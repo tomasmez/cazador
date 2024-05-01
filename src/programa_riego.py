@@ -172,6 +172,9 @@ class Programa:
 
         init_pins(Rele_pins)
 
+        pulse = Pin(2, Pin.OUT)
+        pulse.value(0)
+
         # check if its suspended.
         try:
             suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
@@ -313,6 +316,7 @@ class Programa:
             print(f"Starting manual program." )
             print(self.delay_secs)
             toggle_port(self.rele_pins[0])
+            toggle_port(2) # invert the operation of the pulse for timer.
             self.state("run")
 
         if self.state() == "wait":
@@ -335,6 +339,7 @@ class Programa:
                                 print(self.delay_secs)
 
                                 toggle_port(self.rele_pins[0])
+                                toggle_port(2) # invert the operation of the pulse for timer.
                                 self.state("run")
 
             #else:
@@ -342,10 +347,11 @@ class Programa:
 
 
         if(self.state() == "cancelled"):
-           print("Riego Cancelado")
-           init_pins(self.rele_pins)
-           self.counter = 1
-           self.state("wait")
+            print("Riego Cancelado")
+            init_pins(self.rele_pins)
+            self.counter = 1
+            self.state("wait")
+            toggle_port(2) # invert the operation of the pulse for timer.
 
         if(self.state() == "run"):       
             pin = Pin(self.rele_pins[self.counter], Pin.OUT)
@@ -358,6 +364,7 @@ class Programa:
                     self.counter = 1
                     self.state("wait")
                     toggle_port(self.rele_pins[0])
+                    toggle_port(2) # invert the operation of the pulse for timer.
                     return
 
             if pin.value():
@@ -389,8 +396,7 @@ class Programa:
         return ret_val
 
     def interrupt_func(self, t):
-        pulse = Pin(2, Pin.OUT)
-        pulse.value(1)
+        toggle_port(2)
         if self.seconds == 60:
             self.seconds = 0
 
@@ -413,7 +419,7 @@ class Programa:
         if free_mem < 50000:
             print(f"program runnning: {self.program_running()}, Free ram: {free_mem}")
         
-        pulse.value(0)
+        toggle_port(2)
 
    # starts the timer for the programs.
     def run(self, periodo):
