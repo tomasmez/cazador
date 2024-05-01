@@ -273,7 +273,7 @@ class Programa:
     def run_program(self, program_name = None):
         
         if self.state() == "run" or self.state() == "manual_run":
-            print("WARN: run_program cannot execute if running already. cancel program first.")
+            #print("WARN: run_program cannot execute if running already. cancel program first.")
             return [self.actual_program, sum(self.delay_secs)]
 
         elif not program_name:
