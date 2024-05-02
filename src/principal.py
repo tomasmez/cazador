@@ -1,7 +1,7 @@
 from machine import RTC
 import sys
 import gc
-import os
+import os,network
 import ujson
 import globales
 from globales import read_json_config
@@ -309,6 +309,34 @@ def register(request):
         except Exception as ex:
             my_dict["device_name"] = 'NO_DEVICE_REGISTERED'
             return render_template(template,my_dict)
+
+
+# Function to scan WiFi networks and return SSIDs with their signal strengths
+def scan_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    networks = wlan.scan()
+    return [(network[0].decode(), network[3]) for network in networks]  # SSID and power
+
+# Flask route to handle WiFi scanning and return SSIDs with signal strengths
+@app.route('/scan_wifi', methods=['GET'])
+def get_wifi_networks(request):
+    try:
+        networks = scan_wifi()
+        return {'networks': networks}
+    except Exception as e:
+        return {'error': str(e)}
+
+
+@app.route('/scan_wifi_save', methods=['POST'])
+def scan_wifi_save(request):
+    return request.form
+
+@app.route('/wifi_config', methods=['GET'])
+def wifi_config_menu(request):
+    return render_template('templates/wifi_config.html',{})
+
+
 
 
 print('Server started')
