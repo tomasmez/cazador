@@ -21,6 +21,7 @@ TEMPLATES=(
 	"horas_arranque.html"
 	"tiempos_riego.html"
 	"registration.html"
+	"wifi_config.html"
 	)	
 
 HEADER="$SOURCE_DIR/header.html"
