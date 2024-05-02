@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Configuration</title>
+    <script>
+        function scanWiFi() {
+            var spinner = document.getElementById('spinner');
+            var wifiList = document.getElementById('wifiList');
+            var form = document.getElementById('wifiForm');
+
+            // Show spinner and hide WiFi list
+            spinner.style.display = 'inline-block';
+            wifiList.style.display = 'none';
+
+            // Fetch WiFi networks from server
+            fetch('/scan_wifi')
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous list
+                wifiList.innerHTML = '';
+
+                // Add radio buttons for each network
+                data.networks.forEach(network => {
+                    var radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'wifi';
+                    radio.value = network[0];  // SSID
+                    radio.id = network[0];
+                    var label = document.createElement('label');
+                    label.htmlFor = network[0];
+                    label.appendChild(document.createTextNode(network[0] + ' (Power: ' + network[1] + ')'));
+                    wifiList.appendChild(radio);
+                    wifiList.appendChild(label);
+                    wifiList.appendChild(document.createElement('br'));
+
+                    // Add password input box for each network
+                    var passwordInput = document.createElement('input');
+                    passwordInput.type = 'password';
+                    passwordInput.name = 'password-' + network[0];  // Password for the network
+                    passwordInput.placeholder = 'Password for ' + network[0];
+                    wifiList.appendChild(passwordInput);
+                    wifiList.appendChild(document.createElement('br'));
+                });
+
+                // Show WiFi list and hide spinner
+                wifiList.style.display = 'block';
+                spinner.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                spinner.style.display = 'none';
+                alert('Failed to fetch WiFi networks.');
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>WiFi Configuration</h1>
+    <form id="wifiForm" action="/scan_wifi_save" method="POST">
+        <label for="deviceName">Device Name:</label>
+        <input type="text" id="deviceName" name="deviceName" required>
+        <br><br>
+        <button type="button" onclick="scanWiFi()">Scan WiFi</button>
+        <span id="spinner" style="display: none;">Loading...</span>
+        <div id="wifiList" style="display: none;"></div>
+        <br><br>
+        <input type="submit" value="Save">
+    </form>
+</body>
+</html>
