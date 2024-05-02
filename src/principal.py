@@ -254,8 +254,6 @@ def return_json_file(request):
     if not file_name:
         return ujson.load({'error': 'File name not provided'})
 
-    print(f"globals at globales = {globales.print_g()}")
-
     try:
         #print(f"printing: {file_name.split(".")[0]} at globales.")
         #print(f"{file_name.split(".")[0]} = {globales.print_g(file_name.split(".")[0])}")
