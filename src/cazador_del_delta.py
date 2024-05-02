@@ -260,7 +260,9 @@ def dict_to_html_table(input_dict):
         if 'hora_comienzo' == key:
             html_table += f"<tr><td><mark>{key}</td><td><mark>{value}</td></tr>\n"
         else:
-            html_table += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
+            import re
+            if int(key.split("zone")[1]) <= globales.cantidad_de_zonas:
+                html_table += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
     html_table += "</table>"
     return html_table
         

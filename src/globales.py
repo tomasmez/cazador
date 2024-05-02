@@ -41,7 +41,7 @@ def init():
         cantidad_de_zonas = configuracion["cantidad_de_zonas"]
         timezone = configuracion["timezone"]
     except:
-        cantidad_de_zonas = 7
+        cantidad_de_zonas = 4
         timezone = -3
 
 
