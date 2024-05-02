@@ -16,9 +16,12 @@ def init():
     global riego_automatico
     global riego_suspendido
     global seteo_programas
-    global timezone
 
-    timezone = -3
+    # huso horario. default -3
+    global timezone
+    # cuantas zonas reales tiene conectadas el equipo. default 7
+    global cantidad_de_zonas
+
 
     try:
         riego_automatico = read_json_config("riego_automatico.json")
@@ -32,6 +35,14 @@ def init():
         seteo_programas = read_json_config("seteo_programas.json")
     except:
         seteo_programas = {}
+
+    try:
+        configuracion = read_json_config("configuracion.json")
+        cantidad_de_zonas = configuracion["cantidad_de_zonas"]
+        timezone = configuracion["timezone"]
+    except:
+        cantidad_de_zonas = 7
+        timezone = -3
 
 
 
