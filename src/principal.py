@@ -224,12 +224,9 @@ async def seteo_programas(request):
         my_dict= {}
         for pr in range(1,4,1):
             for i in range(1, globales.cantidad_de_zonas + 1,1):
-                my_dict[f"P{pr}Z{i}IN"] = ' '
-                my_dict[f"P{pr}Z{i}OUT"] = ' '
+                my_dict[f"P{pr}Z{i}"] = f'    <div>\n      <label for="p{pr}-zone{i}">Zona {i}</label>\n      <label for="p{pr}-zone{i}-minutes">Minutos:</label>\n      <select id="p{pr}-zone{i}-minutes" name="p{pr}-zone{i}-minutes">\n      <option value=""></option>\n    </select>\n    </div>'
             for i in range(globales.cantidad_de_zonas + 1,8,1):
-                my_dict[f"P{pr}Z{i}IN"] = '<!--'
-                my_dict[f"P{pr}Z{i}OUT"] = '-->'
-
+                my_dict[f"P{pr}Z{i}"] = ' '
         my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
         return render_template(template,my_dict) 
         
