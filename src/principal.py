@@ -221,7 +221,17 @@ async def seteo_programas(request):
         p1.state("unpause")
         return redirect('/')
     else:
-        return send_file(template) 
+        my_dict= {}
+        for pr in range(1,4,1):
+            for i in range(1, globales.cantidad_de_zonas + 1,1):
+                my_dict[f"P{pr}Z{i}IN"] = ' '
+                my_dict[f"P{pr}Z{i}OUT"] = ' '
+            for i in range(globales.cantidad_de_zonas + 1,8,1):
+                my_dict[f"P{pr}Z{i}IN"] = '<!--'
+                my_dict[f"P{pr}Z{i}OUT"] = '-->'
+
+        my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
+        return render_template(template,my_dict) 
         
 @app.route('/prueba_zonas', methods=['GET', 'POST'])
 async def prueba_zonas(request):
