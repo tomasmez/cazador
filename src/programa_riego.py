@@ -19,19 +19,18 @@ def toggle_port(R_pin):
 
 def read_minutes(programa="programa_1"):
 
-        global seteo_programas
         s_pr = read_json_config_programas(globales.seteo_programas)
         
         p_n = programa.split("_")[1]
 
         delay_mins = [ 0,
-                           int(s_pr[f"p{p_n}-zone1-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone2-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone3-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone4-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone5-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone6-minutes"][0]),
-                           int(s_pr[f"p{p_n}-zone7-minutes"][0]) ]
+                           int(s_pr[f"p{p_n}-zone1-minutes"][0]) if globales.cantidad_de_zonas >= 1 else 0,
+                           int(s_pr[f"p{p_n}-zone2-minutes"][0]) if globales.cantidad_de_zonas >= 2 else 0,
+                           int(s_pr[f"p{p_n}-zone3-minutes"][0]) if globales.cantidad_de_zonas >= 3 else 0,
+                           int(s_pr[f"p{p_n}-zone4-minutes"][0]) if globales.cantidad_de_zonas >= 4 else 0,
+                           int(s_pr[f"p{p_n}-zone5-minutes"][0]) if globales.cantidad_de_zonas >= 5 else 0,
+                           int(s_pr[f"p{p_n}-zone6-minutes"][0]) if globales.cantidad_de_zonas >= 6 else 0,
+                           int(s_pr[f"p{p_n}-zone7-minutes"][0]) if globales.cantidad_de_zonas >= 7 else 0 ]
 
         # print(delay_mins)
 
@@ -360,7 +359,7 @@ class Programa:
                     toggle_port(self.rele_pins[self.counter])
                     
                 self.counter += 1
-                if self.counter == 8:
+                if self.counter == globales.cantidad_de_zonas + 1:
                     self.counter = 1
                     self.state("wait")
                     toggle_port(self.rele_pins[0])
