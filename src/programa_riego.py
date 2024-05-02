@@ -264,6 +264,10 @@ class Programa:
             self.st = new_state
             if new_delay_secs is not None:
                 self.delay_secs = new_delay_secs
+                # clobber seconds for zones not present.
+                for i in range(len(self.delay_secs)):
+                    if i + 1 > globales.cantidad_de_zonas:
+                        self.delay_secs[i] = 0 
             
         except ValueError:
             print("programa.state new_state not valid:",new_state)
