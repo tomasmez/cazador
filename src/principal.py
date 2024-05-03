@@ -9,7 +9,6 @@ globales.init()
 
 gc.enable()
 
-
 from microdot import Microdot, Response, send_file,redirect
 from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_manual,transform_seteo_programas_json
 from cazador_del_delta import read_calendario,check_wifi
@@ -106,7 +105,7 @@ async def index(request):
         pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
-    print(globales.riego_suspendido,type(globales.riego_suspendido))
+    #print(globales.riego_suspendido,type(globales.riego_suspendido))
     try:
         suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
         if suspendido_hasta_str > get_current_time(): # el riego NO esta suspendido
@@ -121,6 +120,7 @@ async def index(request):
         my_dict["running_program_min"] = ceiling(p1.run_program()[1]/60)
     except:
         pass
+    gc.collect()
     return render_template(template,my_dict)
     
     
@@ -196,6 +196,8 @@ async def seteo_programas(request):
             for i in range(globales.cantidad_de_zonas + 1,8,1):
                 my_dict[f"P{pr}Z{i}"] = ' '
         my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
+
+        gc.collect()
         return render_template(template,my_dict) 
         
 

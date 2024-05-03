@@ -207,8 +207,8 @@ def read_calendario(data):
         return {}
     calendario = {}
     dias_habilitados = []
-    print('calendario_data',data)
-    print('---end---')
+    #print('calendario_data',data)
+    #print('---end---')
     try:
         # Extract the days of the week that are 'on' and add them to dias_habilidatos
         dias_habilitados = [key for key in data.keys() if key in ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"] and data[key] == ["on"]]

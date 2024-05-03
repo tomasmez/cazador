@@ -392,7 +392,7 @@ class Programa:
         ret_val = None
         if self.state() == "run":
             ret_val = []
-            ret_val.append("programa")
+            ret_val.append(f"{self.actual_program}")
             ret_val.append(sum(self.delay_secs))
             ret_val.append(self.counter)
 
@@ -420,7 +420,7 @@ class Programa:
         gc.collect()
         free_mem = gc.mem_free()
         #if free_mem < 50000:
-        print(f"program runnning: {self.program_running()}, Free ram: {free_mem}")
+        print(f"program runnning: {self.program_running()}, Free ram: {free_mem}                         ", end = '\r')
         
         toggle_port(2)
 
