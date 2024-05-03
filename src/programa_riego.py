@@ -403,24 +403,24 @@ class Programa:
         if self.seconds == 60:
             self.seconds = 0
 
-        if self.seconds == 0:
-            b_level = battery_charge()/1000000
-            print(f"Battery level: {b_level:1.2f}V")
+        #if self.seconds == 0:
+        #    b_level = battery_charge()/1000000
+        #    print(f"Battery level: {b_level:1.2f}V")
         self.state_machine()
 
-        temps = temperature_read(self.ds_sensor, self.roms, self.seconds)
-        try:
-            for temp in temps:
-                if isinstance(temp, float):
-                    self.temp = temp
-                   # print(f"Temperature: {temp:2.2f} C")
-        except TypeError:
-            pass
+        #temps = temperature_read(self.ds_sensor, self.roms, self.seconds)
+        #try:
+        #    for temp in temps:
+        #        if isinstance(temp, float):
+        #            self.temp = temp
+        #           # print(f"Temperature: {temp:2.2f} C")
+        #except TypeError:
+        #    pass
         self.seconds += 1
         gc.collect()
         free_mem = gc.mem_free()
-        if free_mem < 50000:
-            print(f"program runnning: {self.program_running()}, Free ram: {free_mem}")
+        #if free_mem < 50000:
+        print(f"program runnning: {self.program_running()}, Free ram: {free_mem}")
         
         toggle_port(2)
 

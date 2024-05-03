@@ -39,6 +39,7 @@ p1.run(1000)
 
 @app.route('/', methods=['GET', 'POST'])
 async def index(request):
+    gc.collect()
     if request.method == 'POST':
         hora_actual_str = get_current_time()
         try:
@@ -82,22 +83,22 @@ async def index(request):
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
     riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
-    print('---riego_automatico_json---')
-    print(riego_automatico_json)
-    print('----')
+#    print('---riego_automatico_json---')
+#    print(riego_automatico_json)
+#    print('----')
     #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
     seteo_programas_json = read_json_config_programas(globales.seteo_programas)
-    print('---seteo_programas_json---')
-    print(seteo_programas_json)
-    print('----')
+#    print('---seteo_programas_json---')
+#    print(seteo_programas_json)
+#    print('----')
     seteo_programas_json_transformed = transform_seteo_programas_json(seteo_programas_json,riego_automatico_json)
-    print('---seteo_programas_transformed---')
-    print(seteo_programas_json)
-    print('----')   
+#    print('---seteo_programas_transformed---')
+#    print(seteo_programas_json)
+#    print('----')   
     calendario_json = read_calendario(globales.riego_automatico)
-    print('---seteo_programas_transformed---')
-    print(calendario_json)
-    print('----')      
+#    print('---seteo_programas_transformed---')
+#    print(calendario_json)
+#    print('----')      
 
     try:
         seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
@@ -122,26 +123,6 @@ async def index(request):
         pass
     return render_template(template,my_dict)
     
-"""    
-@app.route('/cancelar_riego', methods=['GET', 'POST'])
-async def cancelar_riego(request):
-    template = 'templates/cancelar_riego.html'
-    config = 'riego_suspendido.json'
-    if request.method == 'POST':
-        hora_actual_str = get_current_time()
-        suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
-        if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
-            print('RIEGO CANCELADO hasta:',suspendido_hasta_str)
-            #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
-            #request.form["dias_suspendidos"] = dias_suspendidos
-        request.form["suspendido_hasta"] = suspendido_hasta_str
-        p1.state("pause")
-        write_json_config(config,request.form)
-        p1.state("unpause")
-        return redirect('/')
-    else:
-        return render_template(template)
-"""
     
 @app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
@@ -193,24 +174,11 @@ async def horas_arranque(request):
 async def horas_arranque_json(request):
     riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
     return riego_automatico_json
-    
-@app.route('/seteo_riego_manual', methods=['GET', 'POST'])
-async def seteo_riego_manual(request):
-    template = 'templates/seteo_riego_manual.html'
-    config = 'riego_manual.json'
-    if request.method == 'POST':
-        request.form["hora_update"] = get_current_time()
-        p1.state("pause")
-        write_json_config(config,request.form)
-        globales.riego_manual = read_json_config(config)
-        p1.state("unpause")
-        return redirect('/')
-    else:
-        return send_file(template) 
         
 
 @app.route('/tiempos_riego', methods=['GET', 'POST'])
 async def seteo_programas(request):
+    gc.collect()
     template = 'templates/tiempos_riego.html'
     config = 'seteo_programas.json'
     if request.method == 'POST':
@@ -230,25 +198,6 @@ async def seteo_programas(request):
         my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
         return render_template(template,my_dict) 
         
-@app.route('/prueba_zonas', methods=['GET', 'POST'])
-async def prueba_zonas(request):
-    
-    # Function to toggle the specified port
-    def toggle_port(port):
-        from machine import Pin
-        pin = Pin(int(port), Pin.OUT)
-        pin.value(not pin.value())
-
-    
-    template = 'templates/prueba_zonas.html'
-    config = 'prueba_zonas.json'
-    if request.method == 'POST':
-        port = request.form["port"] 
-        print(f"Toggling port: {port}")
-        toggle_port(int(port))
-        return redirect('/prueba_zonas')
-    else:
-        return send_file(template) 
 
 
 @app.route('/return_json_file')
@@ -340,7 +289,6 @@ def scan_wifi_save(request):
 @app.route('/wifi_config', methods=['GET'])
 def wifi_config_menu(request):
     return render_template('templates/wifi_config.html',{})
-
 
 
 
