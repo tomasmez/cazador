@@ -25,6 +25,8 @@ def init():
 
     try:
         riego_automatico = read_json_config("riego_automatico.json")
+        for keys, data in riego_automatico:
+            riego_automatico[key] = [data[0]]
     except:
         riego_automatico = {}
     try:

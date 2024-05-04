@@ -17,40 +17,7 @@ def toggle_port(R_pin):
         pin = Pin(R_pin, Pin.OUT)
         pin.value(not pin.value())
 
-def read_minutes(programa="programa_1"):
 
-        s_pr = read_json_config_programas(globales.read_g("seteo_programas"))
-       
-        cant_z = globales.read_g("cantidad_de_zonas")
-        p_n = programa.split("_")[1]
-
-        delay_mins = [ 0,
-                           int(s_pr[f"p{p_n}-zone1-minutes"][0]) if cant_z >= 1 else 0,
-                           int(s_pr[f"p{p_n}-zone2-minutes"][0]) if cant_z >= 2 else 0,
-                           int(s_pr[f"p{p_n}-zone3-minutes"][0]) if cant_z >= 3 else 0,
-                           int(s_pr[f"p{p_n}-zone4-minutes"][0]) if cant_z >= 4 else 0,
-                           int(s_pr[f"p{p_n}-zone5-minutes"][0]) if cant_z >= 5 else 0,
-                           int(s_pr[f"p{p_n}-zone6-minutes"][0]) if cant_z >= 6 else 0,
-                           int(s_pr[f"p{p_n}-zone7-minutes"][0]) if cant_z >= 7 else 0 ]
-
-        # print(delay_mins)
-
-        return delay_mins
-
-def programa_get_next_time():
-    
-    jdata = read_json_config_programa_manual(globales.read_g("riego_automatico"))
-    #print(jdata)
-
-    ret_data = {}
-
-    for pr in [ "programa_1", "programa_2", "programa_3" ]:
-        try:
-            ret_data.update({ pr : [int(jdata[pr]["hora"]),int(jdata[pr]["minuto"])] } )
-    
-        except KeyError:
-            pass
-    return ret_data
 
 # 0 = domingo, 6 = sabado
 def rtc_weekday(now):
@@ -126,22 +93,6 @@ def temperature_read(ds_sensor, roms, ticker):
                 print(f"ERR: falied to read {rom}")
         return ret_val
     
-def dia_de_riego(time):
-    try:
-        calendario_de_riego = globales.read_g("riego_automatico")
-    except:
-        return True  # si no hay archivo. permito regar
-
-    wday = rtc_weekday(time)
-    #print(f"dia_de_riego: {wday}")
-    DIAS=["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
-
-    try:
-        if calendario_de_riego[DIAS[wday]][0] == "on":
-            return True
-    except:
-        return False
-    return False
 
 """
 Class Programa ejecuta el timer que realiza la función 
@@ -170,23 +121,52 @@ class Programa:
         self.temp = 0.0 #temperatura del ds18b20
         self.actual_program = ""
 
+        """ variables que tengo que guardar en disco cuando las modifico"""
+        self.suspendido_hasta_str = ""
+        self.programas_habilitados = [False, False, False]  #""" True cuando puedo correr este programa """
+        self.programas_next_time = {"programa_1" : [ 0, 0 ], "programa_2" : [ 0, 0 ], "programa_3" : [0, 0 ]}
+        self.dias_de_riego = [ False, False, False, False, False, False, False ] #""" True cuando el dia es de riego. 0 = Domingo """
+        self.minutos_riego = [[0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0]] #""" el primer valor no se usa. """
+        self.cantidad_de_zonas = 5 #""" cantidad de zonas presentes """
+        self.timezone = -3 #""" timezone """
+
+
+
         init_pins(Rele_pins)
 
         pulse = Pin(2, Pin.OUT)
         pulse.value(0)
 
-        # check if its suspended.
+        # read riego_suspendido.json
         try:
-            riego_suspendido= globales.read_g("riego_suspendido")
-            suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
+            riego_suspendido= read_json_config("riego_suspendido.json")
+            print("RIEGO_SUSPENDIDO = ",riego_suspendido)
+            self.suspendido_hasta_str = riego_suspendido["suspendido_hasta"][0]
         except:
-            suspendido_hasta_str = ""
-        if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
+            self.suspendido_hasta_str = ""
+        if self.suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
             self.st = "wait"
             self.prev_st = "off"
         else:
             self.st = "suspend"
             self.prev_st = "wait"
+        # read riego_automatico.json
+        try:
+            riego_automatico = read_json_config("riego_automatico.json")
+            print("RIEGO_AUTOMATICO = ",riego_automatico)
+            #TODO ver programas_habilitados,  y demas variables en el archivo
+        except:
+            #valore default ya existen
+            pass
+        # read seteo_programas.json
+        try:
+            seteo_programas = read_json_config("seteo_programas.json")
+            print("SETEO_PROGRAMAS = ",seteo_programas)
+            #TODO ver minutos voy por aca.
+        except:
+            #valore default ya existen
+            pass
+
 
         ds_pin = Pin(4)
         self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
@@ -194,6 +174,10 @@ class Programa:
         print('Found DS devices: ', self.roms)
 
 
+    def dia_de_riego(self, time):
+
+        wday = rtc_weekday(time)
+        return self.dias_de_riego[wday]
 
 
 
@@ -267,9 +251,8 @@ class Programa:
             if new_delay_secs is not None:
                 self.delay_secs = new_delay_secs
                 # clobber seconds for zones not present.
-                cant_z = globales.read_g("cantidad_de_zonas")
                 for i in range(len(self.delay_secs)):
-                    if i + 1 > cant_z:
+                    if i + 1 > self.cantidad_de_zonas:
                         self.delay_secs[i] = 0 
             
         except ValueError:
@@ -289,7 +272,7 @@ class Programa:
             return None
 
         # need to check if program_name exists.
-        delay_mins = read_minutes(program_name)
+        delay_mins = self.minutos_riego[int(program_name.split("_")) -1]
         self.delay_secs = [x * 60 for x in delay_mins]
         self.actual_program = program_name
 
@@ -327,14 +310,12 @@ class Programa:
 
         if self.state() == "wait":
 
-            if dia_de_riego(now_time):
+            if self.dia_de_riego(now_time):
 
-                next_time = programa_get_next_time()
-
-                for program in next_time:
+                for program in self.programas_next_time:
                     if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
                         if now_time["time"][2] < 2:
-                            delay_mins = read_minutes(program)
+                            delay_mins = self.minutos_riego[int(program.split("_")[1]) - 1]
                             self.delay_secs = [x * 60 for x in delay_mins]
 
                             #special case, run a program that has 0 minutes to run.
@@ -366,7 +347,7 @@ class Programa:
                     toggle_port(self.rele_pins[self.counter])
                     
                 self.counter += 1
-                if self.counter == globales.read_g("cantidad_de_zonas") + 1:
+                if self.counter == self.cantidad_de_zonas + 1:
                     self.counter = 1
                     self.state("wait")
                     toggle_port(self.rele_pins[0])
@@ -379,10 +360,8 @@ class Programa:
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
         if self.state() == "suspend":
-            riego_suspendido = globales.read_g("riego_suspendido")
-            suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
             #print("programa_riego suspendido_hasta_str:",suspendido_hasta_str)
-            if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
+            if self.suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
                 self.state("wait")
 #            else:
 #                print(f"Riego suspendido hasta: {suspendido_hasta_str}")

@@ -162,6 +162,7 @@ async def horas_arranque(request):
     if request.method == 'POST':
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
+        print("hora_arranque: ",request.form)
         write_json_config(config,request.form)
         print(request.form)
         p1.state("unpause")
