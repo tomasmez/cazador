@@ -193,6 +193,7 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
 def read_json_config_programa_manual(data):
     if data == {}:
         return {}
+    print("read_json_config_programa_manual data: ",data)
     programs = [key for key in data.keys() if key.startswith("programa_") and data[key] == ["on"]]
     filtered_programs = {}
     for program in programs:
@@ -249,7 +250,6 @@ def write_json_config(file_path, json_data):
     except OSError as e:
         print("Error writing to file:", e)
         return
-    print("json_data dias suspendidos = ",json_data["dias_suspendidos"])
     globales.write_g(file_path.split(".")[0],json_data)
         
 

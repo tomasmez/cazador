@@ -19,18 +19,19 @@ def toggle_port(R_pin):
 
 def read_minutes(programa="programa_1"):
 
-        s_pr = read_json_config_programas(globales.seteo_programas)
-        
+        s_pr = read_json_config_programas(globales.read_g("seteo_programas"))
+       
+        cant_z = globales.read_g("cantidad_de_zonas")
         p_n = programa.split("_")[1]
 
         delay_mins = [ 0,
-                           int(s_pr[f"p{p_n}-zone1-minutes"][0]) if globales.cantidad_de_zonas >= 1 else 0,
-                           int(s_pr[f"p{p_n}-zone2-minutes"][0]) if globales.cantidad_de_zonas >= 2 else 0,
-                           int(s_pr[f"p{p_n}-zone3-minutes"][0]) if globales.cantidad_de_zonas >= 3 else 0,
-                           int(s_pr[f"p{p_n}-zone4-minutes"][0]) if globales.cantidad_de_zonas >= 4 else 0,
-                           int(s_pr[f"p{p_n}-zone5-minutes"][0]) if globales.cantidad_de_zonas >= 5 else 0,
-                           int(s_pr[f"p{p_n}-zone6-minutes"][0]) if globales.cantidad_de_zonas >= 6 else 0,
-                           int(s_pr[f"p{p_n}-zone7-minutes"][0]) if globales.cantidad_de_zonas >= 7 else 0 ]
+                           int(s_pr[f"p{p_n}-zone1-minutes"][0]) if cant_z >= 1 else 0,
+                           int(s_pr[f"p{p_n}-zone2-minutes"][0]) if cant_z >= 2 else 0,
+                           int(s_pr[f"p{p_n}-zone3-minutes"][0]) if cant_z >= 3 else 0,
+                           int(s_pr[f"p{p_n}-zone4-minutes"][0]) if cant_z >= 4 else 0,
+                           int(s_pr[f"p{p_n}-zone5-minutes"][0]) if cant_z >= 5 else 0,
+                           int(s_pr[f"p{p_n}-zone6-minutes"][0]) if cant_z >= 6 else 0,
+                           int(s_pr[f"p{p_n}-zone7-minutes"][0]) if cant_z >= 7 else 0 ]
 
         # print(delay_mins)
 
@@ -38,7 +39,7 @@ def read_minutes(programa="programa_1"):
 
 def programa_get_next_time():
     
-    jdata = read_json_config_programa_manual(globales.riego_automatico)
+    jdata = read_json_config_programa_manual(globales.read_g("riego_automatico"))
     #print(jdata)
 
     ret_data = {}
@@ -127,7 +128,7 @@ def temperature_read(ds_sensor, roms, ticker):
     
 def dia_de_riego(time):
     try:
-        calendario_de_riego = globales.riego_automatico
+        calendario_de_riego = globales.read_g("riego_automatico")
     except:
         return True  # si no hay archivo. permito regar
 
@@ -176,7 +177,7 @@ class Programa:
 
         # check if its suspended.
         try:
-            suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
+            suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
         except:
             suspendido_hasta_str = ""
         if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
@@ -265,8 +266,9 @@ class Programa:
             if new_delay_secs is not None:
                 self.delay_secs = new_delay_secs
                 # clobber seconds for zones not present.
+                cant_z = globales.read_g("cantidad_de_zonas")
                 for i in range(len(self.delay_secs)):
-                    if i + 1 > globales.cantidad_de_zonas:
+                    if i + 1 > cant_z:
                         self.delay_secs[i] = 0 
             
         except ValueError:
@@ -337,7 +339,7 @@ class Programa:
                             #special case, run a program that has 0 minutes to run.
                             # need to skip this run.
                             if sum(self.delay_secs) != 0:
-                                print(f"Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}" )
+                                print(f'Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}' )
                                 self.actual_program = program
                                 print(self.delay_secs)
 
@@ -363,7 +365,7 @@ class Programa:
                     toggle_port(self.rele_pins[self.counter])
                     
                 self.counter += 1
-                if self.counter == globales.cantidad_de_zonas + 1:
+                if self.counter == globales.read_g("cantidad_de_zonas") + 1:
                     self.counter = 1
                     self.state("wait")
                     toggle_port(self.rele_pins[0])
@@ -376,7 +378,7 @@ class Programa:
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
         if self.state() == "suspend":
-            suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
+            suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
             if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
                 self.state("wait")
 #            else:
