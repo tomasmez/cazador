@@ -193,7 +193,7 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
 def read_json_config_programa_manual(data):
     if data == {}:
         return {}
-    print("read_json_config_programa_manual data: ",data)
+    #print("read_json_config_programa_manual data: ",data)
     programs = [key for key in data.keys() if key.startswith("programa_") and data[key] == ["on"]]
     filtered_programs = {}
     for program in programs:

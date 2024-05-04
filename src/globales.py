@@ -29,7 +29,7 @@ def init():
         riego_automatico = {}
     try:
         riego_suspendido = read_json_config("riego_suspendido.json")
-        print("globales riego_suspendido: ",riego_suspendido)
+        #print("globales riego_suspendido: ",riego_suspendido)
     except:
         riego_suspendido = {}
     try:
@@ -47,9 +47,9 @@ def init():
 
 def write_g(g_var, g_data):
 
-    print(f"BEFORE {g_var} = {globals()[g_var]}")
+    #print(f"BEFORE {g_var} = {globals()[g_var]}")
     globals()[g_var] = g_data
-    print(f"AFTER {g_var} = {globals()[g_var]}")
+    #print(f"AFTER {g_var} = {globals()[g_var]}")
 
 
 

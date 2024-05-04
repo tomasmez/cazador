@@ -48,10 +48,10 @@ async def index(request):
                 p1.state("suspend")
             elif p1.state() == "suspend":
                 p1.state("wait")
-            request.form["suspendido_hasta"] =  suspendido_hasta_str
+            print("suspendido_hsata in POST of /: ",suspendido_hasta_str)
+            request.form["suspendido_hasta"] =   suspendido_hasta_str
             p1.state("pause")
             config = 'riego_suspendido.json'
-            print("request.form = ",request.form)
             write_json_config(config,request.form)
             p1.state("unpause")
             return redirect('/')
@@ -104,7 +104,8 @@ async def index(request):
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     try:
-        suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
+        riego_suspendido = globales.read_g("riego_suspendido")
+        suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
         if suspendido_hasta_str > get_current_time(): # el riego NO esta suspendido
             print('CONFIRMADO Riego suspendido hasta',suspendido_hasta_str)
             my_dict["riego_suspendido"] = f"<mark>{suspendido_hasta_str}</mark>"

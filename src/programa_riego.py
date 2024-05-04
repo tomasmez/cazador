@@ -177,7 +177,8 @@ class Programa:
 
         # check if its suspended.
         try:
-            suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
+            riego_suspendido= globales.read_g("riego_suspendido")
+            suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
         except:
             suspendido_hasta_str = ""
         if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
@@ -378,7 +379,9 @@ class Programa:
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
         if self.state() == "suspend":
-            suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
+            riego_suspendido = globales.read_g("riego_suspendido")
+            suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
+            #print("programa_riego suspendido_hasta_str:",suspendido_hasta_str)
             if suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
                 self.state("wait")
 #            else:
