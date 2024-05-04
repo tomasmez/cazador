@@ -53,12 +53,14 @@ async def index(request):
             request.form["suspendido_hasta"] = suspendido_hasta_str
             p1.state("pause")
             config = 'riego_suspendido.json'
+            print("request.form = ",request.form)
             write_json_config(config,request.form)
-            globales.riego_suspendido = read_json_config(config)
+
+            #globales.riego_suspendido = read_json_config(config)
             p1.state("unpause")
             return redirect('/')
-        except:
-            print("hubo una excepcion dentro de dias suspendidos")
+        except Exception as ex:
+            print("hubo una excepcion dentro de dias suspendidos:", ex)
             pass
         try:
             programa_manual = request.form["programa_manual"]
@@ -107,7 +109,7 @@ async def index(request):
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     #print(globales.riego_suspendido,type(globales.riego_suspendido))
     try:
-        suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
+        suspendido_hasta_str = globales.read_g("riego_suspendido")["suspendido_hasta"][0]
         if suspendido_hasta_str > get_current_time(): # el riego NO esta suspendido
             print('CONFIRMADO Riego suspendido hasta',suspendido_hasta_str)
             my_dict["riego_suspendido"] = f"<mark>{suspendido_hasta_str}</mark>"
@@ -185,7 +187,7 @@ async def seteo_programas(request):
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
         write_json_config(config,request.form)
-        globales.seteo_programas = read_json_config(config)
+        #globales.seteo_programas = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -214,8 +216,8 @@ def return_json_file(request):
 
     try:
         #print(f"printing: {file_name.split(".")[0]} at globales.")
-        #print(f"{file_name.split(".")[0]} = {globales.print_g(file_name.split(".")[0])}")
-        json_data = ujson.dumps(globales.print_g(file_name.split(".")[0]))
+        #print(f"{file_name.split(".")[0]} = {globales.read_g(file_name.split(".")[0])}")
+        json_data = ujson.dumps(globales.read_g(file_name.split(".")[0]))
         #print(json_data)
         #print(read_json_config(file_name))
     except:

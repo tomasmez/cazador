@@ -44,9 +44,15 @@ def init():
         cantidad_de_zonas = 5
         timezone = -3
 
+def write_g(g_var, g_data):
+
+    print(f"BEFORE {g_var} = {globals()[g_var]}")
+    globals()[g_var] = g_data
+    print(f"AFTER {g_var} = {globals()[g_var]}")
 
 
-def print_g(g_var = None):
+
+def read_g(g_var = None):
     if not g_var:
         return globals()
     return globals()[g_var]

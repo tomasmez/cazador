@@ -249,9 +249,8 @@ def write_json_config(file_path, json_data):
     except OSError as e:
         print("Error writing to file:", e)
         return
-    file.close()
-    # now we update the variable in ram
-    var_name = file_path.split(".")[0]
+    print("json_data dias suspendidos = ",json_data["dias_suspendidos"])
+    globales.write_g(file_path.split(".")[0],json_data)
         
 
 def dict_to_html_table(input_dict):
