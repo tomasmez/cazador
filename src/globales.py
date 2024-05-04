@@ -29,6 +29,7 @@ def init():
         riego_automatico = {}
     try:
         riego_suspendido = read_json_config("riego_suspendido.json")
+        riego_suspendido["suspendido_hasta"] = riego_suspendido["suspendido_hasta"][0] #ugly hack
         #print("globales riego_suspendido: ",riego_suspendido)
     except:
         riego_suspendido = {}
