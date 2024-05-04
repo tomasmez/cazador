@@ -45,18 +45,20 @@ async def index(request):
             suspendido_hasta_str = get_current_time(int(request.form["dias_suspendidos"]))
             if suspendido_hasta_str > hora_actual_str: # se cancela el riego, ponemos algo en rojo para ver
                 print('RIEGO SUSPENDIDO hasta:',suspendido_hasta_str)
+                #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
+                #request.form["dias_suspendidos"] = dias_suspendidos
                 p1.state("suspend")
             elif p1.state() == "suspend":
                 p1.state("wait")
-            print("suspendido_hsata in POST of /: ",suspendido_hasta_str)
-            request.form["suspendido_hasta"] =   suspendido_hasta_str
+            request.form["suspendido_hasta"] = suspendido_hasta_str
             p1.state("pause")
             config = 'riego_suspendido.json'
             write_json_config(config,request.form)
+            globales.riego_suspendido = read_json_config(config)
             p1.state("unpause")
             return redirect('/')
-        except Exception as ex:
-            #print("hubo una excepcion dentro de dias suspendidos:", ex)
+        except:
+            print("hubo una excepcion dentro de dias suspendidos")
             pass
         try:
             programa_manual = request.form["programa_manual"]
@@ -79,12 +81,12 @@ async def index(request):
 
     my_dict = { }
     my_dict["hora_actual"] = get_current_time()
-    riego_automatico_json = read_json_config_programa_manual(globales.read_g("riego_automatico"))
+    riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
 #    print('---riego_automatico_json---')
 #    print(riego_automatico_json)
 #    print('----')
     #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
-    seteo_programas_json = read_json_config_programas(globales.read_g("seteo_programas"))
+    seteo_programas_json = read_json_config_programas(globales.seteo_programas)
 #    print('---seteo_programas_json---')
 #    print(seteo_programas_json)
 #    print('----')
@@ -92,7 +94,7 @@ async def index(request):
 #    print('---seteo_programas_transformed---')
 #    print(seteo_programas_json)
 #    print('----')   
-    calendario_json = read_calendario(globales.read_g("riego_automatico"))
+    calendario_json = read_calendario(globales.riego_automatico)
 #    print('---seteo_programas_transformed---')
 #    print(calendario_json)
 #    print('----')      
@@ -103,17 +105,15 @@ async def index(request):
         pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
+    #print(globales.riego_suspendido,type(globales.riego_suspendido))
     try:
-        riego_suspendido = globales.read_g("riego_suspendido")
-        suspendido_hasta_str = riego_suspendido["suspendido_hasta"]
+        suspendido_hasta_str = globales.riego_suspendido["suspendido_hasta"][0]
         if suspendido_hasta_str > get_current_time(): # el riego NO esta suspendido
             print('CONFIRMADO Riego suspendido hasta',suspendido_hasta_str)
             my_dict["riego_suspendido"] = f"<mark>{suspendido_hasta_str}</mark>"
         else:
-            print('Riego activo fecha vieja:',suspendido_hasta_str)
             my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
-    except Exception as ex:
-        print("excepcion preparando my_dict:",ex)
+    except:
         my_dict["riego_suspendido"] = 'RIEGO ACTIVO'
     try:
         my_dict["running_program_nr"] = p1.run_program()[0]
@@ -123,11 +123,29 @@ async def index(request):
     gc.collect()
     return render_template(template,my_dict)
     
-    
+
+# Endpoint to call the function
+@app.route('/call_function')
+def call_function(request):
+    function_name = request.args.get('function_name')
+    if function_name:
+        # Check if the function exists in the globals
+        if function_name in globals() and callable(globals()[function_name]):
+            # Call the function dynamically
+            result = globals()[function_name]()
+            return {"result": result}
+        else:
+            return {"error": "Function not found"}, 404
+    else:
+        return {"error": "Function name not provided"}, 400
+
+
 @app.route('/config', methods=['GET', 'POST'])
 async def seteo_hora(request):
     rtc = RTC()
     rtc.memory('')
+    current_time = get_current_time()
+    print("CONFIG: Current time is:",current_time)
 
     template = 'templates/config.html'
     #if p1.state() == "run":
@@ -145,7 +163,11 @@ async def seteo_hora(request):
             print(f'Error guardando hora post:{ex}')
         return redirect('/')    
     else:
-        return send_file(template)
+        # fill in current time automatically
+        my_dict = {}
+
+        my_dict["current_time"] = current_time
+        return render_template(template,my_dict)
 
 @app.route('/hard_reset',)
 async def hard_reset(request):
@@ -164,6 +186,7 @@ async def horas_arranque(request):
         p1.state("pause")
         write_json_config(config,request.form)
         print(request.form)
+        globales.riego_automatico = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -171,7 +194,7 @@ async def horas_arranque(request):
         
 @app.route('/horas_arranque_json', methods=['GET'])
 async def horas_arranque_json(request):
-    riego_automatico_json = read_json_config_programa_manual(globales.read_g("riego_automatico"))
+    riego_automatico_json = read_json_config_programa_manual(globales.riego_automatico)
     return riego_automatico_json
         
 
@@ -184,17 +207,17 @@ async def seteo_programas(request):
         request.form["hora_update"] = get_current_time()
         p1.state("pause")
         write_json_config(config,request.form)
+        globales.seteo_programas = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
         my_dict= {}
-        cant_z = globales.read_g("cantidad_de_zonas")
         for pr in range(1,4,1):
-            for i in range(1, cant_z + 1,1):
+            for i in range(1, globales.cantidad_de_zonas + 1,1):
                 my_dict[f"P{pr}Z{i}"] = f'    <div>\n      <label for="p{pr}-zone{i}">Zona {i}</label>\n      <label for="p{pr}-zone{i}-minutes">Minutos:</label>\n      <select id="p{pr}-zone{i}-minutes" name="p{pr}-zone{i}-minutes">\n      <option value=""></option>\n    </select>\n    </div>'
-            for i in range(cant_z + 1,8,1):
+            for i in range(globales.cantidad_de_zonas + 1,8,1):
                 my_dict[f"P{pr}Z{i}"] = ' '
-        my_dict["CANT_ZONAS"] = f"{cant_z}"
+        my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
 
         gc.collect()
         return render_template(template,my_dict) 
@@ -213,8 +236,8 @@ def return_json_file(request):
 
     try:
         #print(f"printing: {file_name.split(".")[0]} at globales.")
-        #print(f"{file_name.split(".")[0]} = {globales.read_g(file_name.split(".")[0])}")
-        json_data = ujson.dumps(globales.read_g(file_name.split(".")[0]))
+        #print(f"{file_name.split(".")[0]} = {globales.print_g(file_name.split(".")[0])}")
+        json_data = ujson.dumps(globales.print_g(file_name.split(".")[0]))
         #print(json_data)
         #print(read_json_config(file_name))
     except:
