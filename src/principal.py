@@ -212,16 +212,11 @@ def return_json_file(request):
     try:
         #print(f"printing: {file_name.split(".")[0]} at globales.")
         #print(f"{file_name.split(".")[0]} = {globales.read_g(file_name.split(".")[0])}")
-        json_data = ujson.dumps(globales.read_g(file_name.split(".")[0]))
+        json_data = read_json_config(file_name)
         #print(json_data)
         #print(read_json_config(file_name))
     except:
-        print(f"WARN: globales global var {file_name} not found\n    Using file on disk instead")
-    # Read the JSON file using ujson
-        json_data = read_json_config(file_name)
-    #json_data = read_json_config(file_name)
-
-    # Return the JSON data
+        pass
     return json_data
 
 
