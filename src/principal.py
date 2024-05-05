@@ -3,6 +3,7 @@ import sys
 import gc
 import os,network
 import ujson
+import asyncio
 
 gc.enable()
 
@@ -305,4 +306,8 @@ def wifi_config_menu(request):
 
 
 print('Server started')
-app.run(port=80,debug=True)
+#app.run(port=80,debug=True)
+async def starter():
+    await app.start_server(port=80,debug=True)
+
+asyncio.run(starter())
