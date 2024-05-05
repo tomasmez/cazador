@@ -101,7 +101,6 @@ async def index(request):
         pass
     
     my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
-    #print(globales.riego_suspendido,type(globales.riego_suspendido))
     try:
         if p1.suspendido_hasta_str > get_current_time(timezone=p1.timezone): # el riego NO esta suspendido
             print('CONFIRMADO Riego suspendido hasta',p1.suspendido_hasta_str)
@@ -140,7 +139,7 @@ def call_function(request):
 async def seteo_hora(request):
     rtc = RTC()
     rtc.memory('')
-    current_time = get_current_time()
+    current_time = get_current_time(timezone=p1.timezone)
     print("CONFIG: Current time is:",current_time)
 
     template = 'templates/config.html'
@@ -183,8 +182,6 @@ async def horas_arranque(request):
         print("hora_arranque: ",request.form)
         write_json_config(config,request.form)
         p1.update_riego_automatico()
-        print(request.form)
-        globales.riego_automatico = read_json_config(config)
         p1.state("unpause")
         return redirect('/')
     else:
@@ -210,13 +207,12 @@ async def seteo_programas(request):
         return redirect('/')
     else:
         my_dict= {}
-        cant_z = p1.cantidad_de_zonas
         for pr in range(1,4,1):
-            for i in range(1, globales.cantidad_de_zonas + 1,1):
+            for i in range(1, p1.cantidad_de_zonas + 1,1):
                 my_dict[f"P{pr}Z{i}"] = f'    <div>\n      <label for="p{pr}-zone{i}">Zona {i}</label>\n      <label for="p{pr}-zone{i}-minutes">Minutos:</label>\n      <select id="p{pr}-zone{i}-minutes" name="p{pr}-zone{i}-minutes">\n      <option value=""></option>\n    </select>\n    </div>'
-            for i in range(globales.cantidad_de_zonas + 1,8,1):
+            for i in range(p1.cantidad_de_zonas + 1,8,1):
                 my_dict[f"P{pr}Z{i}"] = ' '
-        my_dict["CANT_ZONAS"] = f"{globales.cantidad_de_zonas}"
+        my_dict["CANT_ZONAS"] = f"{p1.cantidad_de_zonas}"
 
         gc.collect()
         return render_template(template,my_dict) 
@@ -234,8 +230,6 @@ def return_json_file(request):
         return ujson.load({'error': 'File name not provided'})
 
     try:
-        #print(f"printing: {file_name.split(".")[0]} at globales.")
-        #print(f"{file_name.split(".")[0]} = {globales.read_g(file_name.split(".")[0])}")
         json_data = read_json_config(file_name)
         #print(json_data)
         #print(read_json_config(file_name))
