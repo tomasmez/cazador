@@ -18,6 +18,12 @@ def test_wifi_connection(ssid, password):
     return False
 
 
+def write_wifi_credentials_to_file(ssid, password, filename="wifi_client.json"):
+    credentials = {"ssid": ssid, "password": password}
+    with open(filename, "w") as file:
+        ujson.dump(credentials, file)
+
+
 def read_json_config(file_path):
 
     try:

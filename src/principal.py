@@ -9,7 +9,7 @@ gc.enable()
 
 from microdot import Microdot, Response, send_file,redirect
 from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_manual,transform_seteo_programas_json
-from cazador_del_delta import read_calendario,check_wifi, read_json_config,test_wifi_connection
+from cazador_del_delta import read_calendario,check_wifi, read_json_config,test_wifi_connection, write_wifi_credentials_to_file
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
 from programa_riego import Programa, toggle_port
 from machine import RTC
@@ -310,6 +310,7 @@ def wifi_config_menu(request):
         ssid = request.form["wifiDropdown"]
         password = request.form["passwordInput"]
         if test_wifi_connection(ssid,password):
+            write_wifi_credentials_to_file(ssid,password)
             return { 'result' : 'OK'}
         else:
             return { 'result' : 'ERROR'}
