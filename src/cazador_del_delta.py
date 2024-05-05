@@ -6,6 +6,18 @@ from time import gmtime, time
 import os
 import network
 
+
+def test_wifi_connection(ssid, password):
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(ssid, password)
+    for _ in range(10):  # Try for 30 seconds
+        if wlan.isconnected():
+            return True
+        utime.sleep(1)
+    return False
+
+
 def read_json_config(file_path):
 
     try:
