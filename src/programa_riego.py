@@ -357,8 +357,9 @@ class Programa:
 
             if self.dia_de_riego(now_time):
 
+
                 for program in self.programas_next_time:
-                    if next_time[program] == [now_time["time"][0], now_time["time"][1]]:
+                    if self.programas_next_time[program] == [now_time["time"][0], now_time["time"][1]]:
                         if now_time["time"][2] < 2:
                             delay_mins = self.minutos_riego[int(program.split("_")[1]) - 1]
                             self.delay_secs = [x * 60 for x in delay_mins]
