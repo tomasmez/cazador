@@ -34,8 +34,9 @@ p1=Programa(reles)
 p1.run(1000)
 
 @app.route('/', methods=['GET', 'POST'])
-async def index(request):
+def index(request):
     gc.collect()
+    print("entering /...")
     if request.method == 'POST':
         hora_actual_str = get_current_time(timezone=p1.timezone)
         try:
@@ -78,30 +79,30 @@ async def index(request):
 
     my_dict = { }
     my_dict["hora_actual"] = get_current_time(timezone=p1.timezone)
-    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
+###    riego_automatico_json = read_json_config_programa_manual("riego_automatico.json")
 #    print('---riego_automatico_json---')
 #    print(riego_automatico_json)
 #    print('----')
     #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
-    seteo_programas_json = read_json_config_programas("seteo_programas.json")
+###    seteo_programas_json = read_json_config_programas("seteo_programas.json")
 #    print('---seteo_programas_json---')
 #    print(seteo_programas_json)
 #    print('----')
-    seteo_programas_json_transformed = transform_seteo_programas_json(seteo_programas_json,riego_automatico_json)
+###    seteo_programas_json_transformed = transform_seteo_programas_json(seteo_programas_json,riego_automatico_json)
 #    print('---seteo_programas_transformed---')
 #    print(seteo_programas_json)
 #    print('----')   
-    calendario_json = read_calendario("riego_automatico.json")
+###    calendario_json = read_calendario("riego_automatico.json")
 #    print('---seteo_programas_transformed---')
 #    print(calendario_json)
 #    print('----')      
 
-    try:
-        seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
-    except:
-        pass
+###    try:
+###        seteo_programas_json_transformed["dias_habilitados"] = calendario_json["dias_habilitados"]
+###    except:
+###        pass
     
-    my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
+###    my_dict["programas_configurados"] = json_to_html_table(seteo_programas_json_transformed)
     try:
         if p1.suspendido_hasta_str > get_current_time(timezone=p1.timezone): # el riego NO esta suspendido
             print('CONFIRMADO Riego suspendido hasta',p1.suspendido_hasta_str)
