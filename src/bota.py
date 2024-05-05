@@ -3,9 +3,11 @@ import network
 import usocket as socket
 import utime
 import urequests
-from machine import Pin, RTC
+from machine import Pin, RTC, freq
 from globales import read_json_config
 # Create Access Point
+freq(240000000)
+print(f"the frequency is {freq()}")
 ap_ssid = "ESP32_AP"
 ap_password = ""
 utime.sleep(1)
