@@ -44,9 +44,9 @@ def rtc_weekday(now):
 
     return 1
 
-def rtc_current_time():
+def rtc_current_time(tz):
 
-    date_time = get_current_time()
+    date_time = get_current_time(timezone=tz)
 
     ret_date = date_time.split(" ")[0]
     ret_time = date_time.split(" ")[1]
@@ -107,6 +107,7 @@ la interfaz con el usuario (web server).
 class Programa:
 
 
+
     def __init__(self, Rele_pins):
 
         self.reset_marker = ""
@@ -138,31 +139,16 @@ class Programa:
         pulse.value(0)
 
         # read riego_suspendido.json
+        self.update_suspendido_hasta()
         try:
-            riego_suspendido= read_json_config("riego_suspendido.json")
-            print("RIEGO_SUSPENDIDO = ",riego_suspendido)
-            self.suspendido_hasta_str = riego_suspendido["suspendido_hasta"][0]
-        except:
-            self.suspendido_hasta_str = ""
-        if self.suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
-            self.st = "wait"
-            self.prev_st = "off"
-        else:
-            self.st = "suspend"
-            self.prev_st = "wait"
-        # read riego_automatico.json
-        try:
-            riego_automatico = read_json_config("riego_automatico.json")
-            print("RIEGO_AUTOMATICO = ",riego_automatico)
-            #TODO ver programas_habilitados,  y demas variables en el archivo
-        except:
-            #valore default ya existen
-            pass
+            #actualiza dias de riego habilitados y tiempos de arranque de cada programa
+            self.update_riego_automatico()
+        except Exception as e:
+            print("Failed to update_riego_automatico():",e)
         # read seteo_programas.json
         try:
-            seteo_programas = read_json_config("seteo_programas.json")
-            print("SETEO_PROGRAMAS = ",seteo_programas)
-            #TODO ver minutos voy por aca.
+            # actualizo los minutos
+            self.update_seteo_programas()
         except:
             #valore default ya existen
             pass
@@ -173,6 +159,65 @@ class Programa:
         self.roms = self.ds_sensor.scan()
         print('Found DS devices: ', self.roms)
 
+    def update_suspendido_hasta(self):
+        try:
+            riego_suspendido= read_json_config("riego_suspendido.json")
+            print("RIEGO_SUSPENDIDO = ",riego_suspendido)
+            self.suspendido_hasta_str = riego_suspendido["suspendido_hasta"][0]
+        except:
+            self.suspendido_hasta_str = ""
+        if self.suspendido_hasta_str <= get_current_time(timezone=self.timezone): # el riego NO esta suspendido
+            self.st = "wait"
+            self.prev_st = "off"
+        else:
+            self.st = "suspend"
+            self.prev_st = "wait"
+        # read riego_automatico.json
+
+
+    def update_seteo_programas(self):
+
+            seteo_programas = read_json_config("seteo_programas.json")
+            print("SETEO_PROGRAMAS = ",seteo_programas)
+
+            for pr in range(1,4,1):
+                for zn in range(1,self.cantidad_de_zonas+1,1):
+                    try:
+                        self.minutos_riego[pr-1][zn] = int(seteo_programas[f"p{pr}-zone{zn}-minutes"][0])
+                    except KeyError:
+                        self.minutos_riego[pr-1][zn] = 0
+
+                for zn in range(self.cantidad_de_zonas+1,8,1):
+                        self.minutos_riego[pr-1][zn] = 0
+
+            print("self.minutos_riego = ",self.minutos_riego)
+
+
+    def update_riego_automatico(self):
+            riego_automatico = read_json_config("riego_automatico.json")
+            print("RIEGO_AUTOMATICO = ",riego_automatico)
+            
+            self.dias_de_riego = [ False, False, False, False, False, False, False ] #""" True cuando el dia es de riego. 0 = Domingo """
+            SEMANA = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
+            for key in SEMANA:
+                try:
+                    #print(f"DIA = {key} \nRIEGO_AUTOMATICO = {riego_automatico[key][0]}")
+                    if riego_automatico[key][0] == "on":
+                        self.dias_de_riego[SEMANA.index(key)] = True
+                except KeyError:
+                    pass
+            for pr in ["programa_1","programa_2","programa_3"]:
+                    try:
+                        self.programas_next_time[pr][0] = int(riego_automatico[pr+"_start_hour"][0])
+                        self.programas_next_time[pr][1] = int(riego_automatico[pr+"_start_minute"][0])
+                    except KeyError:
+                        self.programas_next_time[pr][0] = 0
+                        self.programas_next_time[pr][1] = 0
+
+
+            print("update_riego_automatico(): self.dias_de_riego = ",self.dias_de_riego)
+            print("update_riego_automatico(): self.programas_next_time = ",self.programas_next_time)
+            return
 
     def dia_de_riego(self, time):
 
@@ -222,7 +267,7 @@ class Programa:
                 
         if new_state == "reset":
             self.st = new_state
-            self.reset_marker = rtc_current_time()
+            self.reset_marker = rtc_current_time(self.timezone)
             self.reset_marker["time"][2] += 10
             if self.reset_marker["time"][2] > 59:
                 self.reset_marker["time"][2] -= 60
@@ -272,7 +317,7 @@ class Programa:
             return None
 
         # need to check if program_name exists.
-        delay_mins = self.minutos_riego[int(program_name.split("_")) -1]
+        delay_mins = self.minutos_riego[int(program_name.split("_")[1]) -1]
         self.delay_secs = [x * 60 for x in delay_mins]
         self.actual_program = program_name
 
@@ -283,7 +328,7 @@ class Programa:
 
 
     def state_machine(self):
-        now_time = rtc_current_time()
+        now_time = rtc_current_time(self.timezone)
 
         if self.state() == "reset":
             from machine import reset
@@ -361,7 +406,7 @@ class Programa:
         
         if self.state() == "suspend":
             #print("programa_riego suspendido_hasta_str:",suspendido_hasta_str)
-            if self.suspendido_hasta_str <= get_current_time(): # el riego NO esta suspendido
+            if self.suspendido_hasta_str <= get_current_time(timezone=self.timezone): # el riego NO esta suspendido
                 self.state("wait")
 #            else:
 #                print(f"Riego suspendido hasta: {suspendido_hasta_str}")
