@@ -6,7 +6,16 @@ from time import gmtime, time
 import os
 import network
 
-import globales
+def read_json_config(file_path):
+
+    try:
+        with open(file_path, 'r') as file:
+            json_data_local = ujson.load(file)
+            return json_data_local
+    except Exception as e:
+        print('Error',e)
+        return {}
+
 
 def render_template(filename, values_dict={}):
     try:
@@ -20,7 +29,7 @@ def render_template(filename, values_dict={}):
         print("Error:", e)
         
 
-def get_current_time(days_to_add=0):
+def get_current_time(timezone, days_to_add=0):
     from machine import I2C, Pin
     from ds1307 import DS1307
     
@@ -60,7 +69,7 @@ def get_current_time(days_to_add=0):
     #print(current_time)
     # Add delta_days to the current date
     
-    current_timestamp = utime.mktime(new_time) + globales.timezone * 60 * 60
+    current_timestamp = utime.mktime(new_time) + timezone * 60 * 60
     
     # Calculate the new timestamp after adding days
     new_timestamp = current_timestamp + (days_to_add * 24 * 60 * 60)
@@ -117,7 +126,7 @@ def set_local_time(datetime_str):
     
     # Convert the datetime components into a UNIX timestamp
     timestamp = (year, month, day, hour, minute, 1, 0, 0)
-    timestamp += globales.timezone * 3600
+    timestamp += timezone * 3600
     print('Setting local time to',(year, month, day, hour, minute, 1, 0, 0))
     # Set the local time
     # DS1307 on 0x68
@@ -147,7 +156,8 @@ def set_local_time(datetime_str):
 #        print('Error',e)
 #        return {}    
         
-def read_json_config_programas(json_data):
+def read_json_config_programas(filename):
+    json_data = read_json_config(filename)
     if json_data == {}:
         return {}
             # Filter out zones that are not 'on' and include minutes for the ones that are on
@@ -190,7 +200,9 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
     
     return transformed_data
 
-def read_json_config_programa_manual(data):
+def read_json_config_programa_manual(filename):
+
+    data = read_json_config(filename)
     if data == {}:
         return {}
     #print("read_json_config_programa_manual data: ",data)
@@ -203,7 +215,9 @@ def read_json_config_programa_manual(data):
         filtered_programs[f"programa_{program_number}"] = {"hora": start_hour, "minuto": start_minute}
     return filtered_programs
 
-def read_calendario(data):
+
+def read_calendario(filename):
+    data = read_json_config(filename)
     if data == {}:
         return {}
     calendario = {}
@@ -250,17 +264,16 @@ def write_json_config(file_path, json_data):
     except OSError as e:
         print("Error writing to file:", e)
         return
-    globales.write_g(file_path.split(".")[0],json_data)
         
 
-def dict_to_html_table(input_dict):
+def dict_to_html_table(input_dict, cantidad_de_zonas = 7):
     html_table = "<table>\n"
     for key, value in input_dict.items():
         if 'hora_comienzo' == key:
             html_table += f"<tr><td><mark>{key}</td><td><mark>{value}</td></tr>\n"
         else:
             import re
-            if int(key.split("zone")[1]) <= globales.cantidad_de_zonas:
+            if int(key.split("zone")[1]) <= cantidad_de_zonas:
                 html_table += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
     html_table += "</table>"
     return html_table
