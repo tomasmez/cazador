@@ -39,7 +39,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 spinner.style.display = 'none';
-                alert('Failed to fetch WiFi networks.');
+                alert('Falla en busqueda de redes WiFi.');
             });
         }
     </script>
@@ -48,14 +48,14 @@
 </head>
 <body>
     <h1>Configuración WiFi </h1>
-    <form id="wifiForm" action="/scan_wifi_save" method="POST">
+    <form id="wifiForm" action="/wifi_config" method="POST">
         <label for="deviceName" style="display: none;">Nombre (ej:jardin74):</label>
         <input type="text" id="deviceName" name="deviceName"  style="display: none;" required>
         <br><br>
         <select id="wifiDropdown" style="display: none;"></select>
         <input type="password" id="passwordInput" placeholder="Password" style="display: none;">
-        <button onclick="scanWiFi()">Scan WiFi</button>
-        <div id="spinner" style="display: none;">Loading...</div>
+        <button onclick="scanWiFi()">Escanear redes WiFi</button>
+        <div id="spinner" style="display: none;">Buscando redes WiFi...</div>
         
         <br><br>
         <input type="submit" value="Save">
