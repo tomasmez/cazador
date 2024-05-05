@@ -162,7 +162,7 @@ class Programa:
     def update_suspendido_hasta(self):
         try:
             riego_suspendido= read_json_config("riego_suspendido.json")
-            print("RIEGO_SUSPENDIDO = ",riego_suspendido)
+ #           print("RIEGO_SUSPENDIDO = ",riego_suspendido)
             self.suspendido_hasta_str = riego_suspendido["suspendido_hasta"][0]
         except:
             self.suspendido_hasta_str = ""
@@ -178,7 +178,7 @@ class Programa:
     def update_seteo_programas(self):
 
             seteo_programas = read_json_config("seteo_programas.json")
-            print("SETEO_PROGRAMAS = ",seteo_programas)
+ #           print("SETEO_PROGRAMAS = ",seteo_programas)
 
             for pr in range(1,4,1):
                 for zn in range(1,self.cantidad_de_zonas+1,1):
@@ -190,12 +190,12 @@ class Programa:
                 for zn in range(self.cantidad_de_zonas+1,8,1):
                         self.minutos_riego[pr-1][zn] = 0
 
-            print("self.minutos_riego = ",self.minutos_riego)
+#            print("self.minutos_riego = ",self.minutos_riego)
 
 
     def update_riego_automatico(self):
             riego_automatico = read_json_config("riego_automatico.json")
-            print("RIEGO_AUTOMATICO = ",riego_automatico)
+#            print("RIEGO_AUTOMATICO = ",riego_automatico)
             
             self.dias_de_riego = [ False, False, False, False, False, False, False ] #""" True cuando el dia es de riego. 0 = Domingo """
             SEMANA = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
@@ -215,8 +215,8 @@ class Programa:
                         self.programas_next_time[pr][1] = 0
 
 
-            print("update_riego_automatico(): self.dias_de_riego = ",self.dias_de_riego)
-            print("update_riego_automatico(): self.programas_next_time = ",self.programas_next_time)
+#            print("update_riego_automatico(): self.dias_de_riego = ",self.dias_de_riego)
+#            print("update_riego_automatico(): self.programas_next_time = ",self.programas_next_time)
             return
 
     def dia_de_riego(self, time):
