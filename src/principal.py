@@ -305,7 +305,7 @@ def wifi_config_menu(request):
             print(request.form)
             ssid = request.form["wifiDropdown"]
             password = request.form["password"]
-            if test_wifi_connection(ssid,password):
+            if test_wifi_connection(ssid,password) and ssid and password:
                 write_wifi_credentials_to_file(ssid,password)
                 my_dict["mensaje"] = "Clave guardada correctamente"
                 return render_template('templates/wifi_config.html',my_dict)
@@ -322,7 +322,7 @@ def wifi_config_menu(request):
             my_dict["mensaje"] = result
             return render_template('templates/wifi_config.html',my_dict)
         except:
-            my_dict["mensaje"] = "Aui podra escanear y guardar la config de wifi."
+            my_dict["mensaje"] = "Aqui podra escanear y guardar la config de wifi."
             return render_template('templates/wifi_config.html',my_dict)
 
 
