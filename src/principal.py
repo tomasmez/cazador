@@ -296,27 +296,34 @@ def get_wifi_networks(request):
         return {'error': str(e)}
 
 
-@app.route('/scan_wifi_save', methods=['POST'])
-def scan_wifi_save(request):
-    return request.form
-
-
-
-
 
 @app.route('/wifi_config', methods=['GET','POST'])
 def wifi_config_menu(request):
+    my_dict = {}
     if request.method == 'POST':
-        ssid = request.form["wifiDropdown"]
-        password = request.form["passwordInput"]
-        if test_wifi_connection(ssid,password):
-            write_wifi_credentials_to_file(ssid,password)
-            return { 'result' : 'OK'}
-        else:
-            return { 'result' : 'ERROR'}
+        try:
+            print(request.form)
+            ssid = request.form["wifiDropdown"]
+            password = request.form["password"]
+            if test_wifi_connection(ssid,password):
+                write_wifi_credentials_to_file(ssid,password)
+                my_dict["mensaje"] = "Clave guardada correctamente"
+                return render_template('templates/wifi_config.html',my_dict)
+            else:
+                my_dict["mensaje"] = "Clave incorrecta"
+                return render_template('templates/wifi_config.html',my_dict)
+        except Exception as ex:
+            my_dict["mensaje"] = ex
+            return render_template('templates/wifi_config.html',my_dict)
         
     else: #GET
-        return render_template('templates/wifi_config.html',{})
+        try:
+            result = request.form["result"]
+            my_dict["mensaje"] = result
+            return render_template('templates/wifi_config.html',my_dict)
+        except:
+            my_dict["mensaje"] = "Aui podra escanear y guardar la config de wifi."
+            return render_template('templates/wifi_config.html',my_dict)
 
 
 

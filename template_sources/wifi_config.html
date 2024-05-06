@@ -47,17 +47,41 @@
     
 </head>
 <body>
-    <h1>WiFi Config</h1>
-    <form id="wifiForm" action="/wifi_config" method="POST">
+    <h1>WiFi Conf </h1>
 
-        <br><br>
-        <select id="wifiDropdown" style="display: none;"></select>
-        <input type="password" id="passwordInput" placeholder="Password" style="display: none;">
-        <button onclick="scanWiFi()">Escanear redes WiFi</button>
-        <div id="spinner" style="display: none;">Buscando redes WiFi...</div>
+    <mark></mark><div id="quickMessage"></div></mark>
+
+    <form id="wifiForm" action="/wifi_config" method="POST">
+        <select name="wifiDropdown" id="wifiDropdown" style="display: none;"></select>
+        <input type="password" name="password" id="passwordInput" placeholder="Password" style="display: none;">
         
+        <div id="spinner" style="display: none;">Buscando redes WiFi...</div>
         <br><br>
         <input type="submit" value="Save">
+
+
     </form>
+    <button onclick="scanWiFi()">Escanear redes WiFi</button>
+
+
+    <script>
+        // Function to show the quick message
+        function showQuickMessage(message, duration) {
+            var quickMessage = document.getElementById('quickMessage');
+            quickMessage.innerText = message;
+            quickMessage.style.display = 'block';
+    
+            // Hide the quick message after the specified duration
+            setTimeout(function() {
+                quickMessage.style.display = 'none';
+            }, duration);
+        }
+    
+        // Example: Show the message for 3 seconds
+        var message = "XXXmensajeXXX";
+        showQuickMessage(message, 5000);
+    </script>
+
+
 </body>
 </html>

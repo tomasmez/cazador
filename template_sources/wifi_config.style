@@ -53,6 +53,18 @@
             color: red;
             cursor: pointer;
         }
+        .quick-message {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        }
         hr {
             margin: 20px 0;
             border: 0;
@@ -70,3 +82,4 @@
         input[type="submit"]:hover {
             background-color: #45a049;
         }
+
