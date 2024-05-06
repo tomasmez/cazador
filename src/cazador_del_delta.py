@@ -19,6 +19,7 @@ def test_wifi_connection(ssid, password):
 
 
 def write_wifi_credentials_to_file(ssid, password, filename="wifi_client.json"):
+    print('Guardando ssid y pwd en archivo:',filename)
     credentials = {"ssid": ssid, "password": password}
     with open(filename, "w") as file:
         ujson.dump(credentials, file)

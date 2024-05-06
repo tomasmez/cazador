@@ -6,42 +6,58 @@
     <title>WiFi Configuration</title>
 
     <script>
-        function scanWiFi() {
-            var spinner = document.getElementById('spinner');
-            var wifiDropdown = document.getElementById('wifiDropdown');
-            var passwordInput = document.getElementById('passwordInput');
-    
-            // Show spinner and hide WiFi dropdown and password input
-            spinner.style.display = 'inline-block';
+   function scanWiFi() {
+    var spinner = document.getElementById('spinner');
+    var wifiDropdown = document.getElementById('wifiDropdown');
+    var passwordInput = document.getElementById('passwordInput');
+
+    // Show spinner and hide WiFi dropdown and password input
+    spinner.style.display = 'inline-block';
+    wifiDropdown.style.display = 'none';
+    passwordInput.style.display = 'none';
+
+    // Fetch WiFi networks from server
+    fetch('/scan_wifi')
+    .then(response => response.json())
+    .then(data => {
+        // Clear previous dropdown options
+        wifiDropdown.innerHTML = '';
+
+        if (data.networks.length === 0) {
+            // If no networks found, switch to manual entry mode
             wifiDropdown.style.display = 'none';
-            passwordInput.style.display = 'none';
-    
-            // Fetch WiFi networks from server
-            fetch('/scan_wifi')
-            .then(response => response.json())
-            .then(data => {
-                // Clear previous dropdown options
-                wifiDropdown.innerHTML = '';
-    
-                // Add options to the dropdown for each network
-                data.networks.forEach(network => {
-                    var option = document.createElement('option');
-                    option.value = network[0];  // SSID
-                    option.text = network[0] + ' (Power: ' + network[1] + ')';
-                    wifiDropdown.appendChild(option);
-                });
-    
-                // Show WiFi dropdown and password input
-                wifiDropdown.style.display = 'block';
-                passwordInput.style.display = 'block';
-                spinner.style.display = 'none';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                spinner.style.display = 'none';
-                alert('Falla en busqueda de redes WiFi.');
+
+            var manualSSIDInput = document.createElement('input');
+            manualSSIDInput.type = 'text';
+            manualSSIDInput.placeholder = 'Enter SSID manually';
+            manualSSIDInput.name = 'manualSSID'; // Set the name for form submission
+            wifiDropdown.parentNode.insertBefore(manualSSIDInput, wifiDropdown.nextSibling);
+
+            passwordInput.style.display = 'block'; // Display password input box
+        } else {
+            // Add options to the dropdown for each network
+            data.networks.forEach(network => {
+                var option = document.createElement('option');
+                option.value = network[0];  // SSID
+                option.text = network[0] + ' (Power: ' + network[1] + ')';
+                wifiDropdown.appendChild(option);
             });
+    
+            // Show WiFi dropdown and password input
+            wifiDropdown.style.display = 'block';
+            passwordInput.style.display = 'block';
         }
+
+        spinner.style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        spinner.style.display = 'none';
+        alert('Falla en busqueda de redes WiFi.');
+    });
+}
+
+
     </script>
     
     

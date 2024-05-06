@@ -22,7 +22,7 @@ def do_connect(wifi_credentials):
 
         for num in range(20):  # Try for 30 seconds
             if not sta_if.isconnected():
-                print('Waiting for connection..',num,'sec')
+                print('Waiting for connection..',num,'/20 sec')
                 utime.sleep(1)
 
     print('network config:', sta_if.ifconfig())

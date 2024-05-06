@@ -281,10 +281,12 @@ def register(request):
 
 # Function to scan WiFi networks and return SSIDs with their signal strengths
 def scan_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    networks = wlan.scan()
-    return [(network[0].decode(), network[3]) for network in networks]  # SSID and power
+    wlan_sta = network.WLAN(network.STA_IF)
+    wlan_sta.active()
+    print('Wifi client is active.Scanning networks.')
+    networks = wlan_sta.scan()
+    print('Networks found from scan:',networks)
+    return [(network1[0].decode(), network1[3]) for network1 in networks]  # SSID and power
 
 # Flask route to handle WiFi scanning and return SSIDs with signal strengths
 @app.route('/scan_wifi', methods=['GET'])
@@ -303,15 +305,16 @@ def wifi_config_menu(request):
     if request.method == 'POST':
         try:
             print(request.form)
-            ssid = request.form["wifiDropdown"]
+            if 'wifiDropdown' in request.form:
+                ssid = request.form['wifiDropdown']
+            elif 'manualSSID' in request.form:
+                ssid = request.form['manualSSID']
             password = request.form["password"]
-            if test_wifi_connection(ssid,password) and ssid and password:
-                write_wifi_credentials_to_file(ssid,password)
-                my_dict["mensaje"] = "Clave guardada correctamente"
-                return render_template('templates/wifi_config.html',my_dict)
-            else:
-                my_dict["mensaje"] = "Clave incorrecta"
-                return render_template('templates/wifi_config.html',my_dict)
+            print('ssid y pwd rx',ssid,password)
+            
+            write_wifi_credentials_to_file(ssid,password)
+            my_dict["mensaje"] = "Clave guardada."
+            return render_template('templates/wifi_config.html',my_dict)
         except Exception as ex:
             my_dict["mensaje"] = ex
             return render_template('templates/wifi_config.html',my_dict)
