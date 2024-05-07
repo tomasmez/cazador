@@ -40,10 +40,6 @@ def rtc_weekday(now):
     return three
 
 
-
-
-    return 1
-
 def rtc_current_time(tz):
 
     date_time = get_current_time(timezone=tz)
