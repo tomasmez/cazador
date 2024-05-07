@@ -35,6 +35,8 @@ programa_riego.mpy: $(SRC_DIR)/programa_riego.py
 cazador_del_delta.mpy: $(SRC_DIR)/cazador_del_delta.py
 	$(MPY) "$(SRC_DIR)/cazador_del_delta.py" -o "$(BUILD_DIR)/cazador_del_delta.mpy"
 	
+wifimgr.mpy: $(SRC_DIR)/wifimgr.py
+	$(MPY) "$(SRC_DIR)/wifimgr.py" -o "$(BUILD_DIR)/wifimgr.mpy"
 
 calculate_sunrise_sunset.mpy: $(SRC_DIR)/calculate_sunrise_sunset.py
 	$(MPY) "$(SRC_DIR)/calculate_sunrise_sunset.py" -o "$(BUILD_DIR)/calculate_sunrise_sunset.mpy"
@@ -56,7 +58,8 @@ ds1307: ds_ds1307.mpy ds___init__.mpy ds_version.mpy
 
 microdot: mdot_microdot.mpy mdot___init__.mpy
 
-cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy
+cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy wifimgr.mpy
+
 
 install_c: clean cazador
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
