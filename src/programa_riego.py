@@ -110,7 +110,7 @@ class Programa:
         self.seconds = 0
         self.rele_pins = Rele_pins
         self.states = ["reset","manual_run", "run", "wait", "cancelled", "off", "pause", "unpause"]
-        self.st = ""
+        self.st = "wait"
         self.prev_st = ""
         self.counter = 1
         self.delay_secs = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -396,18 +396,10 @@ class Programa:
                 print("Encendiendo rele", self.counter, "por", self.delay_secs[self.counter], "segundos")
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
-        if self.state() == "suspend":
-            #print("programa_riego suspendido_hasta_str:",suspendido_hasta_str)
-            if self.suspendido_hasta_str <= get_current_time(timezone=self.timezone): # el riego NO esta suspendido
-                self.state("wait")
-#            else:
-#                print(f"Riego suspendido hasta: {suspendido_hasta_str}")
 
     # returns status of running program.
     # tuple [ "programa", minutes remaining, zone number ]
     # returns None if it is not running
-    # TODO: now it has first value hardcoded.
-    #       need to see how it is best to get this info.
 
     def program_running(self):
         ret_val = None
