@@ -446,7 +446,7 @@ class Programa:
         gc.collect()
         free_mem = gc.mem_free()
         #if free_mem < 50000:
-        print(f"program runnning: {self.program_running()}, Free ram: {free_mem}                         ", end = '\r')
+        print(f"program runnning: {self.program_running()}, Free ram: {free_mem} st={self.st} prev_st={self.prev_st}                        ", end = '\r')
         
         toggle_port(2)
 
