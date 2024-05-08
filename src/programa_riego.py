@@ -109,7 +109,7 @@ class Programa:
         self.reset_marker = ""
         self.seconds = 0
         self.rele_pins = Rele_pins
-        self.states = ["reset","manual_run", "run", "wait", "cancelled", "suspend", "off", "pause", "unpause"]
+        self.states = ["reset","manual_run", "run", "wait", "cancelled", "off", "pause", "unpause"]
         self.st = ""
         self.prev_st = ""
         self.counter = 1
@@ -162,13 +162,6 @@ class Programa:
             self.suspendido_hasta_str = riego_suspendido["suspendido_hasta"][0]
         except:
             self.suspendido_hasta_str = ""
-        if self.suspendido_hasta_str <= get_current_time(timezone=self.timezone): # el riego NO esta suspendido
-            self.st = "wait"
-            self.prev_st = "off"
-        else:
-            self.st = "suspend"
-            self.prev_st = "wait"
-        # read riego_automatico.json
 
 
     def update_seteo_programas(self):
@@ -353,23 +346,25 @@ class Programa:
 
             if self.dia_de_riego(now_time):
 
+                if self.suspendido_hasta_str < get_current_time(self.timezone):
 
-                for program in self.programas_next_time:
-                    if self.programas_next_time[program] == [now_time["time"][0], now_time["time"][1]]:
-                        if now_time["time"][2] < 2:
-                            delay_mins = self.minutos_riego[int(program.split("_")[1]) - 1]
-                            self.delay_secs = [x * 60 for x in delay_mins]
 
-                            #special case, run a program that has 0 minutes to run.
-                            # need to skip this run.
-                            if sum(self.delay_secs) != 0:
-                                print(f'Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}' )
-                                self.actual_program = program
-                                print(self.delay_secs)
+                    for program in self.programas_next_time:
+                        if self.programas_next_time[program] == [now_time["time"][0], now_time["time"][1]]:
+                            if now_time["time"][2] < 2:
+                                delay_mins = self.minutos_riego[int(program.split("_")[1]) - 1]
+                                self.delay_secs = [x * 60 for x in delay_mins]
 
-                                toggle_port(self.rele_pins[0])
-                                toggle_port(2) # invert the operation of the pulse for timer.
-                                self.state("run")
+                                #special case, run a program that has 0 minutes to run.
+                                # need to skip this run.
+                                if sum(self.delay_secs) != 0:
+                                    print(f'Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}' )
+                                    self.actual_program = program
+                                    print(self.delay_secs)
+
+                                    toggle_port(self.rele_pins[0])
+                                    toggle_port(2) # invert the operation of the pulse for timer.
+                                    self.state("run")
 
             #else:
             #    print("No es un dia de riego habilitado!!")

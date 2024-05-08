@@ -45,9 +45,6 @@ def index(request):
                 print('RIEGO SUSPENDIDO hasta:',suspendido_hasta_str)
                 #dias_suspendidos = f'<p style="color:red;">RIEGO CANCELADO POR {request.form["dias_suspendidos"]} dias</p>'
                 #request.form["dias_suspendidos"] = dias_suspendidos
-                p1.state("suspend")
-            elif p1.state() == "suspend":
-                p1.state("wait")
             request.form["suspendido_hasta"] = suspendido_hasta_str
             p1.state("pause")
             config = 'riego_suspendido.json'
