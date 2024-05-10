@@ -58,6 +58,15 @@ def init_pins(Rele_pins):
             pin = Pin(i, Pin.OUT)
             pin.value(1)
 
+def status_reles(Rele_pins):
+    
+    ret_val = []
+    for i in Rele_pins:
+        pin = Pin(i, Pin.OUT)
+        ret_val.append(pin.value())
+    return ret_val
+
+
 # funcion para monitorear la carga de la bateria
 def battery_charge():
     from machine import ADC
@@ -433,7 +442,7 @@ class Programa:
         gc.collect()
         free_mem = gc.mem_free()
         #if free_mem < 50000:
-        print(f"program runnning: {self.program_running()}, Free ram: {free_mem} st={self.st} prev_st={self.prev_st}                        ", end = '\r')
+        print(f"program: {self.program_running()}, Free ram: {free_mem} st={self.st} prev_st={self.prev_st}, RELES={status_reles(self.rele_pins)}                        ", end = '\r')
         
         toggle_port(2)
 
