@@ -158,8 +158,10 @@ async def seteo_hora(request):
             #print(f'Error guardando hora post:{ex}')
         try:
             cant_zonas = request.form["cant_zonas"]
+
             p1.cantidad_de_zonas = int(cant_zonas)
             print(f"cantidad de zonas actualzada: {p1.cantidad_de_zonas}")
+            write_json_config("config.json",request.form)
         except:
             pass
         return redirect('/')    

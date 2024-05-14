@@ -10,6 +10,12 @@ from globales import read_json_config
 class ChangeStateError(Exception):
     pass
 
+class NO_timezone(Exception):
+    pass
+
+class NO_cant_zonas(Exception):
+    pass
+
 
 # Function to toggle the specified port
 def toggle_port(R_pin):
@@ -157,6 +163,12 @@ class Programa:
         except:
             #valore default ya existen
             pass
+        try:
+            self.update_global_config()
+        except NO_cant_zonas:
+            self.cantidad_de_zonas = 7
+        except NO_timezone:
+            self.timezone = -3
 
 
         ds_pin = Pin(4)
@@ -172,6 +184,17 @@ class Programa:
         except:
             self.suspendido_hasta_str = ""
 
+    def update_global_config(self):
+        configs = read_json_config("config.json")
+
+        try:
+            self.cantidad_de_zonas = int(configs["cant_zonas"][0])
+        except KeyError:
+            raise NO_cant_zonas
+        try:
+            self.timezone = int(configs["timezone"][0])
+        except KeyError:
+            raise NO_timezone
 
     def update_seteo_programas(self):
 
