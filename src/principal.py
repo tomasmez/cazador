@@ -160,8 +160,7 @@ async def seteo_hora(request):
             cant_zonas = request.form["cant_zonas"]
 
             if p1.state() == "run":
-                init_pins(reles)
-                p1.state("wait")
+                p1.state("cancelled")
 
             p1.cantidad_de_zonas = int(cant_zonas)
             print(f"cantidad de zonas actualzada: {p1.cantidad_de_zonas}")
