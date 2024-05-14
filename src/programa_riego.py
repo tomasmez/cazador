@@ -342,6 +342,10 @@ class Programa:
         self.delay_secs = [x * 60 for x in delay_mins]
         self.actual_program = program_name
 
+        # non-existing zones receive 0 seconds.
+        for i in range(self.cantidad_de_zonas+1,8,1):
+            self.delay_secs[i] = 0
+
         #special case, run a program that has 0 minutes to run.
         # need to skip this run.
         if sum(self.delay_secs) != 0:
@@ -386,6 +390,10 @@ class Programa:
                             if now_time["time"][2] < 2:
                                 delay_mins = self.minutos_riego[int(program.split("_")[1]) - 1]
                                 self.delay_secs = [x * 60 for x in delay_mins]
+
+                                # non-existing zones receive 0 seconds.
+                                for i in range(self.cantidad_de_zonas+1,8,1):
+                                    self.delay_secs[i] = 0
 
                                 #special case, run a program that has 0 minutes to run.
                                 # need to skip this run.
