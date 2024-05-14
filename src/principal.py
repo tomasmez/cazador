@@ -165,8 +165,8 @@ async def seteo_hora(request):
         return redirect('/')    
     else:
         # fill in current time automatically
-        my_dict = {}
-
+        my_dict = {"auswahl1":"","auswahl2":"","auswahl3":"","auswahl4":"","auswahl5":"","auswahl6":"","auswahl7":""}
+        my_dict["auswahl"+str(p1.cantidad_de_zonas)] = 'selected="selected"'
         my_dict["current_time"] = current_time
         return render_template(template,my_dict)
 
