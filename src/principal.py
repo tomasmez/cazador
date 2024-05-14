@@ -11,7 +11,7 @@ from microdot import Microdot, Response, send_file,redirect
 from cazador_del_delta import render_template,get_current_time,json_to_html_table,read_json_config_programas,write_json_config,set_local_time,read_json_config_programa_manual,transform_seteo_programas_json
 from cazador_del_delta import read_calendario,check_wifi, read_json_config,test_wifi_connection, write_wifi_credentials_to_file
 #from calculate_sunrise_sunset import get_sunrise_sunset_times
-from programa_riego import Programa, toggle_port
+from programa_riego import Programa, toggle_port, init_pins
 from machine import RTC
 
 def ceiling(x):
@@ -158,6 +158,10 @@ async def seteo_hora(request):
             #print(f'Error guardando hora post:{ex}')
         try:
             cant_zonas = request.form["cant_zonas"]
+
+            if p1.state() == "run":
+                init_pins(reles)
+                p1.state("wait")
 
             p1.cantidad_de_zonas = int(cant_zonas)
             print(f"cantidad de zonas actualzada: {p1.cantidad_de_zonas}")
