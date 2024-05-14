@@ -149,12 +149,19 @@ async def seteo_hora(request):
     #    p1.run_program("program_1")
 
     if request.method == 'POST':
-        post_time_str = request.form["datetime"]
-        #print('-->',type(post_time_str),post_time_str)
         try:
+            post_time_str = request.form["datetime"]
+            #print('-->',type(post_time_str),post_time_str)
             set_local_time(post_time_str)
         except Exception as ex:
-            print(f'Error guardando hora post:{ex}')
+            pass
+            #print(f'Error guardando hora post:{ex}')
+        try:
+            cant_zonas = request.form["cant_zonas"]
+            p1.cantidad_de_zonas = int(cant_zonas)
+            print(f"cantidad de zonas actualzada: {p1.cantidad_de_zonas}")
+        except:
+            pass
         return redirect('/')    
     else:
         # fill in current time automatically
