@@ -81,7 +81,7 @@ def index(request):
 #    print(riego_automatico_json)
 #    print('----')
     #my_dict["riego_programado"] = json_to_html_table(riego_automatico_json)
-    seteo_programas_json = read_json_config_programas("seteo_programas.json")
+    seteo_programas_json = read_json_config_programas("seteo_programas.json",p1.cantidad_de_zonas)
 #    print('---seteo_programas_json---')
 #    print(seteo_programas_json)
 #    print('----')
