@@ -208,16 +208,16 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
 
         for key, value in seteo_programas_json.items():
             #print('*****',key,value)
-            participant, zone = key.split("-")[0], key.split("-")[1]
+            participant, zone = key.split("-")[0],key.split("-")[1]
             #print(participant,zone)
-            if transformed_data[participant]['hora_comienzo'] != "No configurada":
-                if not value[0] == '00':
-                    transformed_data[participant][zone] = f'{value[0]} min'
+            if not value[0] == '00':
+                transformed_data[participant][zone] = f'{value[0]} min'
 
     except:
         # no initial config issue
         pass
     
+
     return transformed_data
 
 def read_json_config_programa_manual(filename):
@@ -288,7 +288,7 @@ def write_json_config(file_path, json_data):
 
 def dict_to_html_table(input_dict, cantidad_de_zonas = 7):
     html_table = "<table>\n"
-    for key, value in input_dict.items():
+    for key, value in sorted(input_dict.items()):
         if 'hora_comienzo' == key:
             html_table += f"<tr><td><mark>{key}</td><td><mark>{value}</td></tr>\n"
         else:
@@ -309,7 +309,7 @@ def json_to_html_table(json_data):
     # Iterate over the keys of the dictionary
     if json_data:
         #print(json_data,type(json_data))
-        for key, value in json_data.items():
+        for key, value in sorted(json_data.items()):
             html_table += "<tr>\n"
             
             # Add key as table header
