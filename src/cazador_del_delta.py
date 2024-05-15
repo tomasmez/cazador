@@ -198,14 +198,6 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
 
     #print('---->',type(input_json),input_json)
     try:
-        for key, value in seteo_programas_json.items():
-            #print('*****',key,value)
-            if not 'hora' in key:
-                participant, zone = key.split("-")[0], key.split("-")[1]
-                #print(participant,zone)
-                if not value[0] == '00':
-                    transformed_data[participant][zone] = f'{value[0]} min'
-
         for num in range(1,4):
             try:
                 hora = riego_automatico_json[f'programa_{num}']['hora']
@@ -213,6 +205,15 @@ def transform_seteo_programas_json(seteo_programas_json,riego_automatico_json):
                 transformed_data['p' + str(num)]['hora_comienzo'] = f"{hora}:{minuto}"
             except:
                 transformed_data[f'p{num}']['hora_comienzo'] = f"No configurada"
+
+        for key, value in seteo_programas_json.items():
+            print('*****',key,value)
+            participant, zone = key.split("-")[0], key.split("-")[1]
+            print(participant,zone)
+            if transformed_data[participant]['hora_comienzo'] != "No configurada":
+                if not value[0] == '00':
+                    transformed_data[participant][zone] = f'{value[0]} min'
+
     except:
         # no initial config issue
         pass
