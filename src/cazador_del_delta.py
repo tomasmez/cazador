@@ -179,28 +179,16 @@ def read_json_config_programas(filename,cant_zones):
     json_data = read_json_config(filename)
     if json_data == {}:
         return {}
-            # Filter out zones that are not enabled and include minutes for the ones that are on
     filtered_data = {}
-    print(f"json_data = {json_data}")
     for key, value in json_data.items():
-        print(f"\n key = {key}, value = {value}")
         if key == "hora_update":
             continue
 
-        print(f"\nread_json_config_programas: key = {key}")
         breakup = key.split("-")
-        print(f"\nread_json_config_programas: breakup = {breakup}")
         
         if int(breakup[1].split("zone")[1]) > cant_zones:
             continue
         filtered_data.update({key:value})
-            # for key, value in json_data.items():
-            #     if 'on' in value:
-            #         #filtered_data[key] = value
-            #         minute_key = f"{key}-minutes"
-            #         filtered_data[minute_key] = json_data[minute_key]
-            # Order by key
-            # ordered_data = dict(sorted(filtered_data.items()))
     ordered_data = dict(sorted(filtered_data.items()))
     return ordered_data
         
