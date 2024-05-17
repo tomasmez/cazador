@@ -182,9 +182,11 @@ async def seteo_hora(request):
         return redirect('/config')    
     else:
         # fill in current time automatically
-        my_dict = {"auswahl1":"","auswahl2":"","auswahl3":"","auswahl4":"","auswahl5":"","auswahl6":"","auswahl7":"", "probando":"","probar_button":"Probar", "probar_id": "submit"}
+        my_dict = {"auswahl1":"","auswahl2":"","auswahl3":"","auswahl4":"","auswahl5":"","auswahl6":"","auswahl7":"", "probando":"","probar_button":"Probar", "probar_id": "submit","Z1":"","Z2":"","Z3":"","Z4":"","Z5":"","Z6":"","Z7":""}
         my_dict["auswahl"+str(p1.cantidad_de_zonas)] = 'selected="selected"'
         my_dict["current_time"] = current_time
+        for i in range(1, p1.cantidad_de_zonas + 1,1):
+            my_dict[f"Z{i}"] = f'<option value="{i}" >Zona {i}</option>'
 
         if p1.state() == "run" or p1.state() == "manual_run":
             my_dict["probando"] = f"<p>Probando {p1.run_program()[0]} por {ceiling(p1.run_program()[1]/60)} minutos<br></p>"
