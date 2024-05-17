@@ -17,5 +17,34 @@
         <input type="submit" value="Actualizar Zonas">
     </form>
 
+    <form action="/config" method="POST">
+<fieldset>
+	<legend> Probar zonas de riego </legend>
+<div style="display: flex; gap: 10px;">
+	<div>
+        <label for="probar_zonas">Zona:</label>
+		<select id="cant_zonas" name="cant_zonas">
+		<option value="1" >Zona 1</option>
+		<option value="2" >Zona 2</option>
+		<option value="3" >Zona 3</option>
+		<option value="4" >Zona 4</option>
+		<option value="5" >Zona 5</option>
+		<option value="6" >Zona 6</option>
+		<option value="7" >Zona 7</option>
+		</select>
+	</div>
+	<div>
+		<label for="minuto_zonas">Tiempo</label>
+		<select id="minuto_zonas" name="cant_zonas">
+		<option value="1" selected="selected" >1 minuto</option>
+		<option value="2" >2 minutos</option>
+		<option value="5" >5 minutos</option>
+		</select>
+	</div>
+</div>
+        <input type="submit" value="Probar">
+</fieldset>
+    </form>
+
 </body>
 </html>

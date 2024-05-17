@@ -101,7 +101,7 @@ def temperature_read(ds_sensor, roms, ticker):
             try:
                 ret_val.append(ds_sensor.read_temp(rom))
             except:
-                print(f"ERR: falied to read {rom}")
+                print(f"\nERR: falied to read {rom}")
         return ret_val
     
 
@@ -155,7 +155,7 @@ class Programa:
             #actualiza dias de riego habilitados y tiempos de arranque de cada programa
             self.update_riego_automatico()
         except Exception as e:
-            print("Failed to update_riego_automatico():",e)
+            print("\nFailed to update_riego_automatico():",e)
         # read seteo_programas.json
         try:
             # actualizo los minutos
@@ -322,7 +322,7 @@ class Programa:
                         self.delay_secs[i] = 0 
             
         except ValueError:
-            print("programa.state new_state not valid:",new_state)
+            print("\nprograma.state new_state not valid:",new_state)
             return self.st
         except ChangeStateError:
             return self.st
@@ -357,7 +357,7 @@ class Programa:
 
         if self.state() == "reset":
             from machine import reset
-            print(f"now = {now_time}")
+            print(f"\nnow = {now_time}")
             print(f"reset = {self.reset_marker}")
             if now_time["time"] > self.reset_marker["time"]:
                reset()
@@ -372,7 +372,7 @@ class Programa:
             return;
         
         if self.state() == "manual_run":
-            print(f"Starting manual program." )
+            print(f"\nStarting manual program." )
             print(self.delay_secs)
             toggle_port(self.rele_pins[0])
             toggle_port(2) # invert the operation of the pulse for timer.
@@ -398,9 +398,9 @@ class Programa:
                                 #special case, run a program that has 0 minutes to run.
                                 # need to skip this run.
                                 if sum(self.delay_secs) != 0:
-                                    print(f'Starting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}' )
+                                    print(f'\nStarting program: {program} at {now_time["time"][0]}:{now_time["time"][1]}' )
                                     self.actual_program = program
-                                    print(self.delay_secs)
+                                    #print(self.delay_secs)
 
                                     toggle_port(self.rele_pins[0])
                                     toggle_port(2) # invert the operation of the pulse for timer.
@@ -411,7 +411,7 @@ class Programa:
 
 
         if(self.state() == "cancelled"):
-            print("Riego Cancelado")
+            print("\nRiego Cancelado")
             init_pins(self.rele_pins)
             self.counter = 1
             self.state("wait")
@@ -433,7 +433,7 @@ class Programa:
 
             if pin.value():
                 toggle_port(self.rele_pins[self.counter])
-                print("Encendiendo rele", self.counter, "por", self.delay_secs[self.counter], "segundos")
+                print("\nEncendiendo rele", self.counter, "por", self.delay_secs[self.counter], "segundos")
             self.delay_secs[self.counter] = self.delay_secs[self.counter] - 1
         
 
@@ -473,7 +473,10 @@ class Programa:
         gc.collect()
         free_mem = gc.mem_free()
         #if free_mem < 50000:
-        print(f"program: {self.program_running()}, Free ram: {free_mem} st={self.st} prev_st={self.prev_st}, RELES={status_reles(self.rele_pins)}                        ", end = '\r')
+        import esp32
+        tf = esp32.raw_temperature()
+        tc = (tf-32.0)/1.8
+        print(f"program: {self.program_running()}, Free ram: {free_mem} st={self.st} prev_st={self.prev_st}, RELES={status_reles(self.rele_pins)} T={tc}                 ", end = '\r')
         
         toggle_port(2)
 
