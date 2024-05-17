@@ -328,7 +328,7 @@ class Programa:
             return self.st
         return self.st
 
-    def run_program(self, program_name = None):
+    def run_program(self, program_name = None, delay_mins = None):
         
         if self.state() == "run" or self.state() == "manual_run":
             #print("WARN: run_program cannot execute if running already. cancel program first.")
@@ -337,8 +337,10 @@ class Programa:
         elif not program_name:
             return None
 
-        # need to check if program_name exists.
-        delay_mins = self.minutos_riego[int(program_name.split("_")[1]) -1]
+        elif not delay_mins:
+            # need to check if program_name exists.
+            delay_mins = self.minutos_riego[int(program_name.split("_")[1]) -1]
+
         self.delay_secs = [x * 60 for x in delay_mins]
         self.actual_program = program_name
 
@@ -348,6 +350,8 @@ class Programa:
 
         #special case, run a program that has 0 minutes to run.
         # need to skip this run.
+
+
         if sum(self.delay_secs) != 0:
             self.state("manual_run")
 

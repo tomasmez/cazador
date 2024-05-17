@@ -167,12 +167,29 @@ async def seteo_hora(request):
             write_json_config("config.json",request.form)
         except:
             pass
-        return redirect('/')    
+        try:
+            if p1.state() != "run":
+                probar_zonas = request.form["probar_zonas"]
+                minuto_zonas = int(request.form["minuto_zonas"])
+                minutos = [0, 0, 0, 0, 0, 0, 0, 0]
+                minutos[int(probar_zonas)] = minuto_zonas
+                p1.run_program("Test Zona"+probar_zonas,minutos)
+            else:
+                p1.state("cancelled")
+
+        except:
+            pass
+        return redirect('/config')    
     else:
         # fill in current time automatically
-        my_dict = {"auswahl1":"","auswahl2":"","auswahl3":"","auswahl4":"","auswahl5":"","auswahl6":"","auswahl7":""}
+        my_dict = {"auswahl1":"","auswahl2":"","auswahl3":"","auswahl4":"","auswahl5":"","auswahl6":"","auswahl7":"", "probando":"","probar_button":"Probar", "probar_id": "submit"}
         my_dict["auswahl"+str(p1.cantidad_de_zonas)] = 'selected="selected"'
         my_dict["current_time"] = current_time
+
+        if p1.state() == "run" or p1.state() == "manual_run":
+            my_dict["probando"] = f"<p>Probando {p1.run_program()[0]} por {ceiling(p1.run_program()[1]/60)} minutos<br></p>"
+            my_dict["probar_button"] = "Cancelar"
+            my_dict["probar_id"] = "cancelar"
         return render_template(template,my_dict)
 
 @app.route('/hard_reset',)
