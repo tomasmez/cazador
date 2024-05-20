@@ -136,7 +136,7 @@ class Programa:
         """ variables que tengo que guardar en disco cuando las modifico"""
         self.suspendido_hasta_str = ""
         self.programas_habilitados = [False, False, False]  #""" True cuando puedo correr este programa """
-        self.programas_next_time = {"programa_1" : [ 0, 0 ], "programa_2" : [ 0, 0 ], "programa_3" : [0, 0 ]}
+        self.programas_next_time = {"programa_1" : [ None, None ], "programa_2" : [ None, None ], "programa_3" : [None, None ]}
         self.dias_de_riego = [ False, False, False, False, False, False, False ] #""" True cuando el dia es de riego. 0 = Domingo """
         self.minutos_riego = [[0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0]] #""" el primer valor no se usa. """
         self.cantidad_de_zonas = 5 #""" cantidad de zonas presentes """
@@ -229,15 +229,16 @@ class Programa:
                     pass
             for pr in ["programa_1","programa_2","programa_3"]:
                     try:
+                        riego_automatico[pr][0] == 'on'
                         self.programas_next_time[pr][0] = int(riego_automatico[pr+"_start_hour"][0])
                         self.programas_next_time[pr][1] = int(riego_automatico[pr+"_start_minute"][0])
                     except KeyError:
-                        self.programas_next_time[pr][0] = 0
-                        self.programas_next_time[pr][1] = 0
+                        self.programas_next_time[pr][0] = None
+                        self.programas_next_time[pr][1] = None
 
 
-#            print("update_riego_automatico(): self.dias_de_riego = ",self.dias_de_riego)
-#            print("update_riego_automatico(): self.programas_next_time = ",self.programas_next_time)
+            print("update_riego_automatico(): self.dias_de_riego = ",self.dias_de_riego)
+            print("update_riego_automatico(): self.programas_next_time = ",self.programas_next_time)
             return
 
     def dia_de_riego(self, time):
