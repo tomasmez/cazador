@@ -409,6 +409,7 @@ class Programa:
                                     toggle_port(self.rele_pins[0])
                                     toggle_port(2) # invert the operation of the pulse for timer.
                                     self.state("run")
+                                    break
 
             #else:
             #    print("No es un dia de riego habilitado!!")
