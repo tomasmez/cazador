@@ -25,6 +25,8 @@ TEMPLATES=(
 	)	
 
 HEADER="$SOURCE_DIR/header.html"
+VERSION_STRING=`git rev-parse HEAD`
+echo "$VERSION_STRING"
 
 for file in ${TEMPLATES[@]}; do
 	echo "writing $file"
@@ -42,6 +44,7 @@ for file in ${TEMPLATES[@]}; do
 
 	sed -i "s/$STRING/class=\"active\"/g" "$TEMPLATES_DIR/$file"
 	sed -i "s/###ACTIVE.*###//g"  "$TEMPLATES_DIR/$file"
+	sed -i "s/###VERSION###/$VERSION_STRING/g" "$TEMPLATES_DIR/$file"
 
 	cat "$SOURCE_DIR/$file" >> "$TEMPLATES_DIR/$file"
 done
