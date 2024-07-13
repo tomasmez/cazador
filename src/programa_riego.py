@@ -1,11 +1,10 @@
 
-from cazador_del_delta import render_template,get_current_time,json_to_html_table,write_json_config,set_local_time,read_json_config_programas, read_json_config_programa_manual
+from cazador_del_delta import render_template,get_current_time,json_to_html_table,write_json_config,set_local_time,read_json_config_programas, read_json_config_programa_manual, read_json_config
 
 from machine import Timer, Pin
 import time, onewire, ds18x20
 import gc
-import globales
-from globales import read_json_config
+
 
 class ChangeStateError(Exception):
     pass

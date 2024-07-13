@@ -4,7 +4,7 @@ import usocket as socket
 import utime
 import urequests
 from machine import Pin, RTC, freq
-from globales import read_json_config
+from cazador_del_delta import read_json_config
 # Create Access Point
 freq(240000000)
 print(f"the frequency is {freq()}")
@@ -34,6 +34,7 @@ def do_connect(wifi_credentials):
 wifi_credentials=read_json_config("wifi_client.json")
 
 ##############################################################
+wifi_connection_ok = False
 
 if wifi_credentials:
     wifi_connection_ok = do_connect(wifi_credentials)

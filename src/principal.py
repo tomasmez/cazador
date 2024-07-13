@@ -310,10 +310,10 @@ def register(request):
 # Function to scan WiFi networks and return SSIDs with their signal strengths
 def scan_wifi():
     wlan_sta = network.WLAN(network.STA_IF)
-    wlan_sta.active()
+    wlan_sta.active(True)
     print('Wifi client is active.Scanning networks.')
     networks = wlan_sta.scan()
-    print('Networks found from scan:',networks)
+    print('Networks found from scan:',networks,'\n')
     return [(network1[0].decode(), network1[3]) for network1 in networks]  # SSID and power
 
 # Flask route to handle WiFi scanning and return SSIDs with signal strengths
