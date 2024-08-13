@@ -71,4 +71,7 @@ if rtc_ram == b'':
 rtc_ram = rtc.memory()
 print(f"first byte of RTC ram is: {rtc_ram}")
 
+
+import utelnetserver
+utelnetserver.start()
 #import uftpd

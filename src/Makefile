@@ -48,6 +48,9 @@ ds_ds1307.mpy:  $(SRC_DIR)/lib/ds1307/ds1307.py
 ds_version.mpy: $(SRC_DIR)/lib/ds1307/version.py
 	$(MPY) "$(SRC_DIR)/lib/ds1307/version.py" -o "$(BUILD_DIR)/lib/ds1307/version.mpy"
 
+utelnetserver.mpy: $(SRC_DIR)/lib/utelnetserver.py
+	$(MPY) "$(SRC_DIR)/lib/utelnetserver.py" -o "$(BUILD_DIR)/lib/utelnetserver.mpy"
+
 templates:
 	../tools/build_templates.sh "$(BUILD_DIR)"
 
@@ -58,6 +61,8 @@ microdot: mdot_microdot.mpy mdot___init__.mpy
 
 cazador: main.mpy boot.mpy programa_riego.mpy calculate_sunrise_sunset.mpy cazador_del_delta.mpy
 
+utelnet: utelnetserver.mpy
+
 install_c: clean cazador
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
@@ -67,6 +72,6 @@ install_t: clean templates
 install: cazador templates
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
-install_dep: microdot ds1307 cazador templates
+install_dep: microdot ds1307 cazador templates utelnet
 	cd $(BUILD_DIR) && ../tools/copy_files_to_esp32.sh 
 
